@@ -28,7 +28,8 @@ export const WorkoutRecommender = () => {
         setRecommendations([]);
 
         try {
-            const response = await fetch('http://localhost:8000/recommend', {
+            const recommenderUrl = import.meta.env.VITE_RECOMMENDER_URL || 'http://localhost:8000';
+            const response = await fetch(`${recommenderUrl}/recommend`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
