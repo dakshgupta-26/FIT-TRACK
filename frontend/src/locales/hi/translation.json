@@ -1,0 +1,76 @@
+{
+  "sidebar": {
+    "dashboard": "डैशबोर्ड",
+    "workouts": "वर्कआउट",
+    "meals": "भोजन",
+    "health_metrics": "स्वास्थ्य मेट्रिक्स",
+    "goals": "लक्ष्य",
+    "music": "संगीत",
+    "nearby_gyms": "आस-पास के जिम",
+    "profile": "प्रोफ़ाइल",
+    "settings": "सेटिंग्स"
+  },
+  "dashboard": {
+    "greeting_morning": "सुप्रभात, {{name}}!",
+    "greeting_afternoon": "नमस्ते, {{name}}!",
+    "greeting_evening": "शुभ संध्या, {{name}}!",
+    "greeting_night": "शुभ रात्रि, {{name}}!",
+    "summary": "आज के लिए आपका स्वास्थ्य सारांश यहाँ है",
+    "motto": "आज का प्रयास कल की ताकत है। 💪",
+    "daily_steps": "दैनिक कदम",
+    "calories_burned": "कैलोरी बर्न हुई",
+    "active_minutes": "सक्रिय मिनट",
+    "heart_rate": "हृदय गति",
+    "quick_actions": "त्वरित क्रियाएं",
+    "log_water": "पानी लॉग करें",
+    "add_meal": "भोजन जोड़ें",
+    "start_workout": "वर्कआउट शुरू करें",
+    "set_goal": "लक्ष्य निर्धारित करें",
+    "weekly_steps": "साप्ताहिक कदम",
+    "water_intake": "पानी का सेवन",
+    "of_glasses": "8 में से {{count}} गिलास",
+    "complete": "पूर्ण"
+  },
+  "settings_page": {
+    "title": "सेटिंग्स",
+    "description": "अपने खाते, वरीयताओं और इंटीग्रेशन को प्रबंधित करें।",
+    "tabs": {
+      "general": "सामान्य",
+      "security": "सुरक्षा",
+      "notifications": "सूचनाएं",
+      "appearance": "दिखावट",
+      "integrations": "इंटीग्रेशन",
+      "data_privacy": "डेटा और गोपनीयता"
+    },
+    "general": {
+      "title": "सामान्य सेटिंग्स",
+      "description": "अपनी बुनियादी ऐप प्राथमिकताएं कॉन्फ़िगर करें।",
+      "language": "भाषा",
+      "timezone": "समय क्षेत्र",
+      "auto_save": "डेटा ऑटो-सेव करें",
+      "weekly_reports": "साप्ताहिक रिपोर्ट",
+      "save_button": "सेटिंग्स सहेजें"
+    },
+    "security": {
+      "title": "सुरक्षा",
+      "description": "अपने खाते की सुरक्षा और पासवर्ड प्रबंधित करें।",
+      "change_password": "पासवर्ड बदलें",
+      "current_password": "वर्तमान पासवर्ड",
+      "new_password": "नया पासवर्ड",
+      "confirm_new_password": "नए पासवर्ड की पुष्टि करें",
+      "two_factor": "दो-कारक प्रमाणीकरण (2FA)",
+      "two_factor_desc": "अपने खाते में सुरक्षा की एक अतिरिक्त परत जोड़ें।",
+      "enable_2fa": "2FA सक्षम करें",
+      "update_password_button": "पासवर्ड अपडेट करें"
+    },
+    "notifications": {
+        "title": "सूचनाएं",
+        "description": "आप सूचनाएं कैसे प्राप्त करते हैं इसे नियंत्रित करें।",
+        "push": "पुश सूचनाएं",
+        "workout_reminders": "वर्कआउट रिमाइंडर",
+        "meal_reminders": "भोजन रिमाइंडर",
+        "achievement_milestones": "उपलब्धि मील के पत्थर",
+        "save_button": "सूचनाएं सहेजें"
+    }
+  }
+}

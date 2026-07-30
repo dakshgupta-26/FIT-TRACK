@@ -1,0 +1,71 @@
+{
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "workouts": "Workouts",
+    "meals": "Meals",
+    "health_metrics": "Health Metrics",
+    "goals": "Goals",
+    "music": "Music",
+    "progress": "Progress",
+    "nearby_gyms": "Nearby Gyms",
+    "profile": "Profile",
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "greeting_morning": "Good Morning, {{name}}!",
+    "greeting_afternoon": "Good Afternoon, {{name}}!",
+    "greeting_evening": "Good Evening, {{name}}!",
+    "greeting_night": "Good Night, {{name}}!",
+    "summary": "Here's your health summary for today",
+    "motto": "Today's effort is tomorrow's strength. 💪",
+    "daily_steps": "Daily Steps",
+    "calories_burned": "Calories Burned",
+    "active_minutes": "Active Minutes",
+    "heart_rate": "Heart Rate",
+    "quick_actions": "QUICK ACTIONS",
+    "log_water": "Log Water",
+    "add_meal": "Add Meal",
+    "start_workout": "Start Workout",
+    "set_goal": "Set Goal",
+    "weekly_steps": "Weekly Steps",
+    "water_intake": "Water Intake",
+    "of_glasses": "{{count}} of 8 glasses",
+    "complete": "complete"
+  },
+  "settings_page": {
+    "title": "Settings",
+    "description": "Manage your account, preferences, and integrations.",
+    "tabs": {
+      "general": "General", "security": "Security", "notifications": "Notifications",
+      "appearance": "Appearance", "integrations": "Integrations", "data_privacy": "Data & Privacy"
+    },
+    "general": {
+      "title": "General Settings", "description": "Configure your basic app preferences.",
+      "language": "Language", "timezone": "Timezone", "auto_save": "Auto-save data",
+      "weekly_reports": "Weekly Reports", "save_button": "Save General Settings"
+    },
+    "security": {
+      "title": "Security", "description": "Manage your account security and password.",
+      "change_password": "Change Password", "current_password": "Current Password",
+      "new_password": "New Password", "confirm_new_password": "Confirm New Password",
+      "two_factor": "Two-Factor Authentication (2FA)", "two_factor_desc": "Add an extra layer of security.",
+      "enable_2fa": "Enable 2FA", "update_password_button": "Update Password"
+    },
+    "notifications": {
+        "title": "Notifications", "description": "Control how you receive notifications.",
+        "push": "Push Notifications", "workout_reminders": "Workout Reminders",
+        "meal_reminders": "Meal Reminders", "achievement_milestones": "Achievement Milestones",
+        "save_button": "Save Notifications"
+    },
+    "appearance": {
+        "title": "Appearance", "description": "Customize the look and feel of the app.",
+        "theme": "Theme", "accent_color": "Accent Color", "save_button": "Save Appearance"
+    },
+    "integrations": { "title": "Integrations", "description": "Connect external services.", "coming_soon": "Integrations are coming soon!" },
+    "data_privacy": {
+        "title": "Data & Privacy", "description": "Manage your personal data.",
+        "export_data": "Export Your Data", "export_button": "Export Data", "danger_zone": "Danger Zone",
+        "delete_desc": "Permanently delete your account and all data.", "delete_button": "Delete Account"
+    }
+  }
+}

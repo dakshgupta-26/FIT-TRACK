@@ -1,0 +1,325 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 180 16% 99%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 174 83% 32%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 142 76% 36%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 346 83% 56%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 174 83% 32%;
+
+    --radius: 0.75rem;
+
+    /* Enhanced gradients and colors */
+    --workout-bg-strength: linear-gradient(135deg, hsl(174 83% 32% / 0.05), hsl(142 76% 36% / 0.05));
+    --workout-bg-cardio: linear-gradient(135deg, hsl(346 83% 56% / 0.05), hsl(15 86% 56% / 0.05));
+    --workout-bg-flexibility: linear-gradient(135deg, hsl(220 83% 56% / 0.05), hsl(270 83% 56% / 0.05));
+    
+    --difficulty-easy: 142 76% 36%;
+    --difficulty-medium: 45 93% 47%;
+    --difficulty-hard: 346 83% 56%;
+    
+    --playlist-button: 270 91% 65%;
+    --playlist-button-foreground: 0 0% 100%;
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 174 83% 32%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 174 83% 32%;
+
+    /* Dashboard specific gradients */
+    --gradient-success: linear-gradient(135deg, hsl(142, 76%, 36%), hsl(142, 70%, 45%));
+    --gradient-warning: linear-gradient(135deg, hsl(38, 92%, 50%), hsl(25, 95%, 53%));
+    --gradient-danger: linear-gradient(135deg, hsl(0, 84%, 60%), hsl(0, 72%, 51%));
+    --gradient-info: linear-gradient(135deg, hsl(221, 83%, 53%), hsl(194, 100%, 50%));
+    
+    /* Glass effect */
+    --glass-bg: hsla(var(--background), 0.8);
+    --glass-border: hsla(var(--border), 0.3);
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 6%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 6%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 174 60% 30%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 142 76% 36%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 346 83% 56%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 174 83% 32%;
+
+    --sidebar-background: 222.2 84% 6%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 174 60% 30%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 217.2 32.6% 17.5%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217.2 32.6% 17.5%;
+    --sidebar-ring: 174 83% 32%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+}
+
+@layer components {
+  .health-card {
+    @apply bg-card text-card-foreground rounded-xl border shadow-sm transition-all hover:shadow-md;
+  }
+  
+  .dashboard-stat {
+    @apply bg-card p-6 rounded-lg border border-border transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 hover:scale-[1.02];
+    backdrop-filter: blur(10px);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+  }
+  
+  .progress-ring-circle {
+    transition: stroke-dashoffset 0.3s;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+  }
+
+  /* Enhanced workout card styles */
+  .workout-card {
+    @apply relative overflow-hidden bg-card border rounded-2xl shadow-sm transition-all duration-300 hover:shadow-lg hover:scale-[1.02];
+  }
+
+  .workout-card-strength {
+    background: var(--workout-bg-strength);
+  }
+
+  .workout-card-cardio {
+    background: var(--workout-bg-cardio);
+  }
+
+  .workout-card-flexibility {
+    background: var(--workout-bg-flexibility);
+  }
+
+  .workout-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    opacity: 0.1;
+    background: radial-gradient(circle, currentColor 20%, transparent 20%);
+    background-size: 8px 8px;
+    pointer-events: none;
+  }
+
+  .difficulty-badge-easy {
+    @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100;
+  }
+
+  .difficulty-badge-medium {
+    @apply bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100;
+  }
+
+  .difficulty-badge-hard {
+    @apply bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100;
+  }
+
+  .playlist-button {
+    background: linear-gradient(135deg, hsl(var(--playlist-button)), hsl(var(--playlist-button) / 0.8));
+    color: hsl(var(--playlist-button-foreground));
+    box-shadow: 0 4px 12px hsl(var(--playlist-button) / 0.3);
+  }
+
+  .playlist-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px hsl(var(--playlist-button) / 0.4);
+  }
+
+  /* Meal planner specific styles */
+  .nutrition-card {
+    background: linear-gradient(135deg, 
+      hsl(var(--background)) 0%, 
+      hsl(var(--muted) / 0.3) 100%
+    );
+  }
+
+  .meal-item {
+    background: linear-gradient(135deg, 
+      hsl(var(--card)) 0%, 
+      hsl(var(--accent) / 0.1) 100%
+    );
+  }
+
+  .food-card {
+    background: linear-gradient(135deg, 
+      hsl(var(--card)) 0%, 
+      hsl(var(--primary) / 0.02) 100%
+    );
+    transition: all 0.2s ease-in-out;
+  }
+
+  .food-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px hsl(var(--primary) / 0.15);
+  }
+
+  .macro-protein {
+    color: hsl(142, 69%, 58%);
+  }
+
+  .macro-carbs {
+    color: hsl(45, 93%, 47%);
+  }
+
+  .macro-fat {
+    color: hsl(24, 70%, 60%);
+  }
+
+  .water-glass {
+    background: linear-gradient(180deg, 
+      hsl(var(--primary) / 0.8) 0%, 
+      hsl(var(--primary) / 0.6) 100%
+    );
+  }
+
+  /* Goal celebration animations */
+  @keyframes celebration {
+    0% { transform: scale(0.8) rotate(-5deg); opacity: 0; }
+    50% { transform: scale(1.2) rotate(5deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+
+  @keyframes glow {
+    0%, 100% { box-shadow: 0 0 20px hsl(var(--primary) / 0.2); }
+    50% { box-shadow: 0 0 30px hsl(var(--primary) / 0.4), 0 0 40px hsl(var(--primary) / 0.1); }
+  }
+
+  .animate-celebration {
+    animation: celebration 0.5s ease-out;
+  }
+
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite;
+  }
+
+  /* Music Page Enhancements */
+  .playlist-card {
+    @apply transition-all duration-300 ease-in-out hover:shadow-lg hover:scale-[1.02] border border-border/50 bg-card/50 backdrop-blur-sm;
+  }
+
+  .track-row {
+    @apply transition-all duration-200 hover:bg-muted/50 rounded-lg;
+  }
+
+  .playing-track {
+    @apply bg-primary/10 border border-primary/20 shadow-lg;
+    animation: pulse 2s infinite;
+  }
+
+  .progress-bar {
+    @apply w-full h-1 bg-muted rounded-full overflow-hidden;
+  }
+
+  .progress-fill {
+    @apply h-full bg-primary transition-all duration-300;
+  }
+
+  .genre-tag {
+    @apply cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-md;
+  }
+
+  .genre-tag:hover {
+    @apply bg-primary text-primary-foreground;
+  }
+
+  .playlist-cover {
+    @apply w-16 h-16 rounded-lg bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center text-2xl;
+  }
+
+  /* Workout Card Fixed Height and Enhancements */
+  .workout-card {
+    @apply transition-all duration-300 ease-in-out hover:shadow-lg border border-border/50 bg-card/50 backdrop-blur-sm hover:scale-[1.02] hover:border-primary/20;
+    overflow: hidden;
+    background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card)/0.8) 100%);
+    height: 420px; /* Fixed height for consistency */
+  }
+
+  .workout-card-strength {
+    @apply relative;
+    background: linear-gradient(135deg, 
+      hsl(var(--card)) 0%, 
+      hsl(var(--primary)/0.05) 100%
+    );
+  }
+
+  .workout-card-cardio {
+    @apply relative;
+    background: linear-gradient(135deg, 
+      hsl(var(--card)) 0%, 
+      hsl(var(--destructive)/0.05) 100%
+    );
+  }
+
+  .workout-card-flexibility {
+    @apply relative;
+    background: linear-gradient(135deg, 
+      hsl(var(--card)) 0%, 
+      hsl(var(--chart-2)/0.05) 100%
+    );
+  }
+}
