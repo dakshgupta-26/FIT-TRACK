@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Activity, Target, Heart, TrendingUp, Users, Shield, Zap, Star } from 'lucide-react';
+import { Footer } from '@/components/layout/Footer';
+import { TestimonialsSection } from '@/components/landing/TestimonialsSection';
+import { InteractiveFeaturesShowcase } from '@/components/landing/InteractiveFeaturesShowcase';
 
 const LandingPage = () => {
   const features = [
@@ -105,39 +108,7 @@ const LandingPage = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-4 bg-muted/50">
-        <div className="container mx-auto">
-          <div className="text-center mb-16 animate-fade-in">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Everything You Need for Optimal Health
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Our comprehensive platform provides all the tools you need to track, 
-              analyze, and improve your health and fitness.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature, index) => (
-              <Card 
-                key={index} 
-                className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover-scale animate-fade-in group cursor-pointer"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <CardHeader>
-                  <feature.icon className="h-12 w-12 text-primary mb-4 transition-transform duration-300 group-hover:scale-110" />
-                  <CardTitle className="group-hover:text-primary transition-colors duration-300">{feature.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-base">
-                    {feature.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+      <InteractiveFeaturesShowcase />
 
       {/* Stats Section */}
       <section className="py-20 px-4">
@@ -164,47 +135,7 @@ const LandingPage = () => {
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 px-4 bg-muted/50">
-        <div className="container mx-auto">
-          <div className="text-center mb-16 animate-fade-in">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              What Our Users Say
-            </h2>
-            <p className="text-xl text-muted-foreground">
-              Join thousands of satisfied users who have transformed their health
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {testimonials.map((testimonial, index) => (
-              <Card 
-                key={index} 
-                className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover-scale animate-fade-in group"
-                style={{ animationDelay: `${index * 150}ms` }}
-              >
-                <CardContent className="pt-6">
-                  <div className="flex mb-4">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star 
-                        key={i} 
-                        className="h-5 w-5 fill-yellow-400 text-yellow-400 transition-transform duration-300 group-hover:scale-110" 
-                        style={{ animationDelay: `${i * 50}ms` }}
-                      />
-                    ))}
-                  </div>
-                  <p className="text-muted-foreground mb-4 italic group-hover:text-foreground transition-colors duration-300">
-                    "{testimonial.content}"
-                  </p>
-                  <div>
-                    <div className="font-semibold group-hover:text-primary transition-colors duration-300">{testimonial.name}</div>
-                    <div className="text-sm text-muted-foreground">{testimonial.role}</div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+      <TestimonialsSection />
 
       {/* CTA Section */}
       <section className="py-20 px-4">
@@ -232,48 +163,7 @@ const LandingPage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="border-t bg-background/95 py-12 px-4 animate-fade-in">
-        <div className="container mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="animate-fade-in" style={{ animationDelay: '100ms' }}>
-              <div className="flex items-center gap-2 mb-4">
-                <Activity className="h-6 w-6 text-primary animate-pulse" />
-                <span className="text-xl font-bold">FitTracker</span>
-              </div>
-              <p className="text-muted-foreground">
-                The ultimate health and fitness management platform.
-              </p>
-            </div>
-            <div className="animate-fade-in" style={{ animationDelay: '200ms' }}>
-              <h4 className="font-semibold mb-4">Product</h4>
-              <ul className="space-y-2 text-muted-foreground">
-                <li><Link to="/features" className="story-link hover:text-primary transition-colors duration-300">Features</Link></li>
-                <li><Link to="/pricing" className="story-link hover:text-primary transition-colors duration-300">Pricing</Link></li>
-                <li><Link to="/integrations" className="story-link hover:text-primary transition-colors duration-300">Integrations</Link></li>
-              </ul>
-            </div>
-            <div className="animate-fade-in" style={{ animationDelay: '300ms' }}>
-              <h4 className="font-semibold mb-4">Support</h4>
-              <ul className="space-y-2 text-muted-foreground">
-                <li><Link to="/help" className="story-link hover:text-primary transition-colors duration-300">Help Center</Link></li>
-                <li><Link to="/contact" className="story-link hover:text-primary transition-colors duration-300">Contact</Link></li>
-                <li><Link to="/status" className="story-link hover:text-primary transition-colors duration-300">Status</Link></li>
-              </ul>
-            </div>
-            <div className="animate-fade-in" style={{ animationDelay: '400ms' }}>
-              <h4 className="font-semibold mb-4">Company</h4>
-              <ul className="space-y-2 text-muted-foreground">
-                <li><Link to="/about" className="story-link hover:text-primary transition-colors duration-300">About</Link></li>
-                <li><Link to="/privacy" className="story-link hover:text-primary transition-colors duration-300">Privacy</Link></li>
-                <li><Link to="/terms" className="story-link hover:text-primary transition-colors duration-300">Terms</Link></li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-12 pt-8 border-t text-center text-muted-foreground animate-fade-in" style={{ animationDelay: '500ms' }}>
-            <p>&copy; 2024 FitTracker. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

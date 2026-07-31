@@ -69,7 +69,7 @@ export function EnhancedFoodDatabase({
   }, [searchTerm, foods]);
 
   const filteredFoods = useMemo(() => {
-    let filtered = foods.filter(food => {
+    const filtered = foods.filter(food => {
       const matchesSearch = food.name.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(food.category);
       const matchesFavorites = !showFavoritesOnly || food.isFavorite;
@@ -78,7 +78,7 @@ export function EnhancedFoodDatabase({
     });
 
     // Sort foods
-    filtered.sort((a, b) => {
+    return [...filtered].sort((a, b) => {
       switch (sortBy) {
         case 'calories':
           return b.nutrition.calories - a.nutrition.calories;
@@ -90,8 +90,6 @@ export function EnhancedFoodDatabase({
           return a.name.localeCompare(b.name);
       }
     });
-
-    return filtered;
   }, [foods, searchTerm, selectedCategories, showFavoritesOnly, sortBy]);
 
   const handleBatchAdd = () => {

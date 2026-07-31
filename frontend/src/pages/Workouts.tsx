@@ -188,7 +188,7 @@ const Workouts = () => {
 
   // Filter and sort workouts from state
   const filteredWorkouts = useMemo(() => {
-    let filtered = workouts.filter(workout => {
+    const filtered = workouts.filter(workout => {
       if (filters.difficulties.length > 0 && !filters.difficulties.includes(workout.difficulty)) return false;
       if (filters.durations.length > 0) {
         const durationCategory = workout.duration < 30 ? 'short' : workout.duration <= 45 ? 'medium' : 'long';
@@ -198,18 +198,17 @@ const Workouts = () => {
       return true;
     });
 
-    filtered.sort((a, b) => {
+    return [...filtered].sort((a, b) => {
       switch (filters.sortBy) {
         case 'duration': return a.duration - b.duration;
-        case 'difficulty':
+        case 'difficulty': {
           const difficultyOrder = { Easy: 1, Medium: 2, Hard: 3 };
           return difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty];
+        }
         case 'popular':
         default: return (b.popularity || 0) - (a.popularity || 0);
       }
     });
-
-    return filtered;
   }, [filters, workouts]);
 
   const strengthWorkouts = filteredWorkouts.filter(w => w.type === 'Strength');
