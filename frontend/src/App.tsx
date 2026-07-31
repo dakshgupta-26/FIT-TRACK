@@ -21,7 +21,27 @@ import NotFound from "./pages/NotFound";
 import PlaylistCreator from "./pages/PlaylistCreator";
 import Layout from "./Layout";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
-import Progress from './pages/Progress'; // Already imported, which is great
+import { ThemeProvider } from "./contexts/ThemeContext";
+import Progress from './pages/Progress';
+import About from './pages/About';
+import Mission from './pages/Mission';
+import Press from './pages/Press';
+import Partners from './pages/Partners';
+import Security from './pages/Security';
+import Privacy from './pages/Privacy';
+import Terms from './pages/Terms';
+import Cookies from './pages/Cookies';
+import Accessibility from './pages/Accessibility';
+import Contact from './pages/Contact';
+import PricingPage from './pages/PricingPage';
+import HelpCenter from './pages/HelpCenter';
+import DocumentationPage from './pages/DocumentationPage';
+import BlogPage from './pages/BlogPage';
+import CommunityPage from './pages/CommunityPage';
+import ChangelogPage from './pages/ChangelogPage';
+import StatusPage from './pages/StatusPage';
+import RoadmapPage from './pages/RoadmapPage';
+import ScrollToTop from './components/ScrollToTop';
 
 const queryClient = new QueryClient();
 
@@ -81,10 +101,32 @@ const AppContent = () => {
 
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />
+        <Route path="/features" element={<LandingPage />} />
         <Route path="/app" element={<Index />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/mission" element={<Mission />} />
+        <Route path="/press" element={<Press />} />
+        <Route path="/partners" element={<Partners />} />
+        <Route path="/security" element={<Security />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/cookies" element={<Cookies />} />
+        <Route path="/accessibility" element={<Accessibility />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/pricing" element={<PricingPage />} />
+        <Route path="/help" element={<HelpCenter />} />
+        <Route path="/faqs" element={<HelpCenter />} />
+        <Route path="/support" element={<HelpCenter />} />
+        <Route path="/docs" element={<DocumentationPage />} />
+        <Route path="/blog" element={<BlogPage />} />
+        <Route path="/community" element={<CommunityPage />} />
+        <Route path="/changelog" element={<ChangelogPage />} />
+        <Route path="/roadmap" element={<RoadmapPage />} />
+        <Route path="/status" element={<StatusPage />} />
         <Route path="/login" element={
           <PublicRoute>
             <Login />
@@ -188,13 +230,15 @@ const AppContent = () => {
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <AuthProvider>
-          <AppContent />
-        </AuthProvider>
-      </TooltipProvider>
+      <ThemeProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <AuthProvider>
+            <AppContent />
+          </AuthProvider>
+        </TooltipProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 };

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { storage, db } from '@/lib/firebase';
@@ -12,7 +12,7 @@ export const useProfileImageLocal = () => {
   const { toast } = useToast();
 
   // Load user's profile image from Firestore
-  const loadUserProfileImage = async () => {
+  const loadUserProfileImage = useCallback(async () => {
     if (!currentUser) return;
 
     try {
@@ -28,7 +28,7 @@ export const useProfileImageLocal = () => {
     } catch (error) {
       console.error('Error loading profile image:', error);
     }
-  };
+  }, [currentUser]);
 
   // Upload profile image to Firebase Storage
   const uploadProfileImage = async (file: File) => {
@@ -154,7 +154,7 @@ export const useProfileImageLocal = () => {
   // Load image on component mount
   useEffect(() => {
     loadUserProfileImage();
-  }, [currentUser]);
+  }, [loadUserProfileImage]);
 
   return {
     isUploading,

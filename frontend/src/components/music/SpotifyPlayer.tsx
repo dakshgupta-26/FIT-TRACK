@@ -42,30 +42,7 @@ const SpotifyPlayer: React.FC<SpotifyPlayerProps> = ({
   const [deviceId, setDeviceId] = useState<string | null>(null);
   const playerRef = useRef<any>(null);
 
-  // Load Spotify Web Playback SDK
-  useEffect(() => {
-    if (window.Spotify) {
-      initializePlayer();
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.src = 'https://sdk.scdn.co/spotify-player.js';
-    script.async = true;
-    document.body.appendChild(script);
-
-    window.onSpotifyWebPlaybackSDKReady = () => {
-      initializePlayer();
-    };
-
-    return () => {
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
-      }
-    };
-  }, []);
-
-  const initializePlayer = async () => {
+  const initializePlayer = React.useCallback(async () => {
     try {
       // Get access token (you'll need to implement this)
       const token = await getSpotifyAccessToken();
@@ -160,7 +137,30 @@ const SpotifyPlayer: React.FC<SpotifyPlayerProps> = ({
         variant: "destructive",
       });
     }
-  };
+  }, [onPlayerReady, toast, volume]);
+
+  // Load Spotify Web Playback SDK
+  useEffect(() => {
+    if (window.Spotify) {
+      initializePlayer();
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'https://sdk.scdn.co/spotify-player.js';
+    script.async = true;
+    document.body.appendChild(script);
+
+    window.onSpotifyWebPlaybackSDKReady = () => {
+      initializePlayer();
+    };
+
+    return () => {
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+    };
+  }, [initializePlayer]);
 
   const getSpotifyAccessToken = async (): Promise<string> => {
     // This should be implemented to get user's access token
@@ -186,7 +186,7 @@ const SpotifyPlayer: React.FC<SpotifyPlayerProps> = ({
     }
   };
 
-  const playTrack = async (uri: string) => {
+  const playTrack = React.useCallback(async (uri: string) => {
     if (!player || !deviceId) {
       toast({
         title: "Player Not Ready",
@@ -213,7 +213,7 @@ const SpotifyPlayer: React.FC<SpotifyPlayerProps> = ({
         variant: "destructive",
       });
     }
-  };
+  }, [deviceId, player, toast]);
 
   const togglePlayPause = () => {
     if (!player) return;
@@ -261,7 +261,7 @@ const SpotifyPlayer: React.FC<SpotifyPlayerProps> = ({
     if (trackUri && isReady) {
       playTrack(trackUri);
     }
-  }, [trackUri, isReady]);
+  }, [trackUri, isReady, playTrack]);
 
   if (!isReady) {
     return (

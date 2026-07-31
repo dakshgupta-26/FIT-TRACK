@@ -1,0 +1,96 @@
+{
+  "nav": {
+    "features": "Características",
+    "community": "Comunidad",
+    "pricing": "Precios",
+    "faq": "Preguntas",
+    "roadmap": "Hoja de Ruta",
+    "sign_in": "Iniciar Sesión",
+    "get_started": "Empieza Gratis"
+  },
+  "hero": {
+    "badge": "ECOSISTEMA DE SALUD CON IA v2.5",
+    "title_part1": "Tu IA Personal de",
+    "title_part2": "Salud e Inteligencia Fitness",
+    "subtitle": "Transforma tu viaje de bienestar con análisis biométrico en tiempo real, creación inteligente de entrenamientos y seguimiento nutricional.",
+    "start_free": "Comenzar Prueba Gratuita",
+    "view_demo": "Explorar Funciones de IA"
+  },
+  "pricing": {
+    "badge": "PRECIOS TRANSPARENTES",
+    "title": "Invierte en tu Salud a Largo Plazo",
+    "subtitle": "Comienza gratis hoy. Actualiza en cualquier momento para obtener información ilimitada sobre IA y sincronización con relojes inteligentes.",
+    "free_plan": "Plan Gratuito",
+    "pro_plan": "Plan Pro AI",
+    "monthly": "Mensual",
+    "annually": "Anual (Ahorra 20%)",
+    "start_free_btn": "Comenzar Gratis",
+    "upgrade_pro_btn": "Actualizar a Pro AI"
+  },
+  "footer": {
+    "tagline": "Plataforma de salud y fitness impulsada por IA que ayuda a las personas a construir vidas más saludables mediante el seguimiento inteligente.",
+    "product": "Producto",
+    "resources": "Recursos",
+    "company": "Compañía",
+    "stay_updated": "Mantente Actualizado",
+    "newsletter_sub": "Únete a más de 50,000 entusiastas del fitness.",
+    "subscribe": "Suscribirse",
+    "subscribed": "¡Suscrito!",
+    "no_spam": "Sin spam. Solo actualizaciones mensuales.",
+    "copyright": "© 2026 FitTracker. Todos los derechos reservados.",
+    "theme_dark": "Oscuro",
+    "theme_light": "Claro",
+    "theme_system": "Sistema"
+  },
+  "legal": {
+    "privacy": "Privacidad",
+    "terms": "Términos",
+    "cookies": "Cookies",
+    "accessibility": "Accesibilidad"
+  },
+  "sidebar": {
+    "dashboard": "Panel Principal",
+    "workouts": "Entrenamientos",
+    "meals": "Comidas",
+    "health_metrics": "Métricas de Salud",
+    "goals": "Metas",
+    "music": "Música",
+    "nearby_gyms": "Gimnasios Cercanos",
+    "profile": "Perfil",
+    "settings": "Configuración"
+  },
+  "dashboard": {
+    "greeting_morning": "¡Buenos días, {{name}}!",
+    "greeting_afternoon": "¡Buenas tardes, {{name}}!",
+    "greeting_evening": "¡Buenas noches, {{name}}!",
+    "greeting_night": "¡Buenas noches, {{name}}!",
+    "summary": "Aquí está tu resumen de salud de hoy",
+    "motto": "El esfuerzo de hoy es la fuerza de mañana. 💪",
+    "daily_steps": "Pasos Diarios",
+    "calories_burned": "Calorías Quemadas",
+    "active_minutes": "Minutos Activos",
+    "heart_rate": "Ritmo Cardíaco",
+    "quick_actions": "ACCIONES RÁPIDAS",
+    "log_water": "Registrar Agua",
+    "add_meal": "Agregar Comida",
+    "start_workout": "Iniciar Entrenamiento",
+    "set_goal": "Establecer Meta",
+    "weekly_steps": "Pasos Semanales",
+    "water_intake": "Consumo de Agua",
+    "of_glasses": "{{count}} de 8 vasos",
+    "complete": "completado"
+  },
+  "settings_page": {
+    "title": "Configuración",
+    "description": "Administra tu cuenta, preferencias e integraciones.",
+    "tabs": {
+      "general": "General", "security": "Seguridad", "notifications": "Notificaciones",
+      "appearance": "Apariencia", "integrations": "Integraciones", "data_privacy": "Datos y Privacidad"
+    },
+    "general": {
+      "title": "Configuración General", "description": "Configura tus preferencias básicas.",
+      "language": "Idioma", "timezone": "Zona Horaria", "auto_save": "Guardar automáticamente",
+      "weekly_reports": "Reportes Semanales", "save_button": "Guardar Configuración"
+    }
+  }
+}

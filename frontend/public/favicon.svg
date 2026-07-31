@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <!-- Dark Navy Background -->
+  <rect width="512" height="512" rx="120" fill="#030914"/>
+  
+  <!-- Outer Rounded Teal Frame -->
+  <rect x="28" y="28" width="456" height="456" rx="96" fill="none" stroke="#14b8a6" stroke-width="20" stroke-opacity="0.8"/>
+  
+  <!-- Glowing Pulse Waveform -->
+  <path 
+    d="M 120 256 L 195 256 L 225 170 L 260 342 L 295 205 L 325 275 L 355 256 L 392 256" 
+    fill="none" 
+    stroke="#2dd4bf" 
+    stroke-width="32" 
+    stroke-linecap="round" 
+    stroke-linejoin="round"
+  />
+</svg>

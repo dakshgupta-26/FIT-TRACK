@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useToast } from './use-toast';
 
 interface SpotifyAuthState {
@@ -30,36 +30,31 @@ export const useSpotifyAuth = () => {
     isLoading: true,
   });
 
-  useEffect(() => {
-    // Check if we have a token in localStorage
-    const token = localStorage.getItem('spotify_access_token');
-    const tokenExpiry = localStorage.getItem('spotify_token_expiry');
-    
-    if (token && tokenExpiry && Date.now() < parseInt(tokenExpiry)) {
-      // Token is still valid
+  const fetchUserInfo = useCallback(async (token: string) => {
+    try {
+      const response = await fetch('https://api.spotify.com/v1/me', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch user info');
+      }
+
+      const user = await response.json();
+      
       setAuthState(prev => ({
         ...prev,
-        isAuthenticated: true,
-        accessToken: token,
-        isLoading: false,
+        user,
       }));
-      
-      // Fetch user info
-      fetchUserInfo(token);
-    } else {
-      // Check for authorization code in URL
-      const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get('code');
-      
-      if (code) {
-        exchangeCodeForToken(code);
-      } else {
-        setAuthState(prev => ({ ...prev, isLoading: false }));
-      }
+
+    } catch (error) {
+      console.error('Error fetching user info:', error);
     }
   }, []);
 
-  const exchangeCodeForToken = async (code: string) => {
+  const exchangeCodeForToken = useCallback(async (code: string) => {
     try {
       const response = await fetch('https://accounts.spotify.com/api/token', {
         method: 'POST',
@@ -115,31 +110,36 @@ export const useSpotifyAuth = () => {
         variant: "destructive",
       });
     }
-  };
+  }, [fetchUserInfo, toast]);
 
-  const fetchUserInfo = async (token: string) => {
-    try {
-      const response = await fetch('https://api.spotify.com/v1/me', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch user info');
-      }
-
-      const user = await response.json();
-      
+  useEffect(() => {
+    // Check if we have a token in localStorage
+    const token = localStorage.getItem('spotify_access_token');
+    const tokenExpiry = localStorage.getItem('spotify_token_expiry');
+    
+    if (token && tokenExpiry && Date.now() < parseInt(tokenExpiry)) {
+      // Token is still valid
       setAuthState(prev => ({
         ...prev,
-        user,
+        isAuthenticated: true,
+        accessToken: token,
+        isLoading: false,
       }));
-
-    } catch (error) {
-      console.error('Error fetching user info:', error);
+      
+      // Fetch user info
+      fetchUserInfo(token);
+    } else {
+      // Check for authorization code in URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+      
+      if (code) {
+        exchangeCodeForToken(code);
+      } else {
+        setAuthState(prev => ({ ...prev, isLoading: false }));
+      }
     }
-  };
+  }, [exchangeCodeForToken, fetchUserInfo]);
 
   const login = () => {
     const authUrl = `https://accounts.spotify.com/authorize?` +

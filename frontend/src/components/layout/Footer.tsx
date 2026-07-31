@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useRef } from 'react';
+import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { 
   Activity, 
@@ -8,37 +8,32 @@ import {
   Twitter, 
   Instagram, 
   Mail, 
-  Send, 
   Check, 
-  Globe, 
-  ChevronDown, 
   Sparkles, 
   ArrowRight,
-  Sun,
-  Moon,
-  Heart
+  ArrowUp
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-interface FooterProps {
-  currentTheme?: string;
-  onThemeToggle?: () => void;
-}
-
-export const Footer: React.FC<FooterProps> = ({ currentTheme = 'dark', onThemeToggle }) => {
+export const Footer: React.FC = () => {
   const [email, setEmail] = useState('');
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState('English (US)');
-  const [isLangOpen, setIsLangOpen] = useState(false);
+  const [hoveredLegal, setHoveredLegal] = useState<string | null>(null);
 
-  const languages = [
-    { code: 'en', name: 'English (US)', flag: '🇺🇸' },
-    { code: 'es', name: 'Español', flag: '🇪🇸' },
-    { code: 'fr', name: 'Français', flag: '🇫🇷' },
-    { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
-    { code: 'ja', name: '日本語', flag: '🇯🇵' },
-  ];
+  // Mouse follow spotlight tracking for bottom bar
+  const bottomBarRef = useRef<HTMLDivElement>(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [isHoveringBar, setIsHoveringBar] = useState(false);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!bottomBarRef.current) return;
+    const rect = bottomBarRef.current.getBoundingClientRect();
+    setMousePos({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  };
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,7 +53,18 @@ export const Footer: React.FC<FooterProps> = ({ currentTheme = 'dark', onThemeTo
     }, 800);
   };
 
-  // Animation variants
+  // Scroll to Top utilizing Lenis if present or smooth native scroll
+  const scrollToTop = () => {
+    if (typeof window !== 'undefined') {
+      const lenis = (window as any).lenis;
+      if (lenis && typeof lenis.scrollTo === 'function') {
+        lenis.scrollTo(0, { duration: 1.2 });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+  };
+
   const containerVariants = {
     hidden: { opacity: 0, y: 30 },
     visible: {
@@ -99,44 +105,46 @@ export const Footer: React.FC<FooterProps> = ({ currentTheme = 'dark', onThemeTo
     { name: 'Health Reports', href: '/metrics' },
     { name: 'Pricing', href: '/pricing' },
     { name: 'Roadmap', href: '/roadmap' },
-    { name: 'API', href: '/api-docs' },
-    { name: 'Integrations', href: '/integrations' },
+    { name: 'API Docs', href: '/docs' },
+    { name: 'Integrations', href: '/partners' },
     { name: 'Changelog', href: '/changelog' },
   ];
 
   const resourceLinks = [
     { name: 'Help Center', href: '/help' },
     { name: 'Documentation', href: '/docs' },
-    { name: 'Developer API', href: '/api-docs' },
     { name: 'Blog', href: '/blog' },
     { name: 'Community', href: '/community' },
-    { name: 'Tutorials', href: '/tutorials' },
-    { name: 'Release Notes', href: '/release-notes' },
-    { name: 'FAQs', href: '/faqs' },
-    { name: 'Support', href: '/support' },
-    { name: 'Contact', href: '/contact' },
+    { name: 'FAQs', href: '/help' },
+    { name: 'Contact Us', href: '/contact' },
   ];
 
   const companyLinks = [
     { name: 'About', href: '/about' },
     { name: 'Our Mission', href: '/mission' },
-    { name: 'Careers', href: '/careers', badge: 'Hiring' },
     { name: 'Press', href: '/press' },
     { name: 'Partners', href: '/partners' },
-    { name: 'Security', href: '/security' },
     { name: 'Privacy Policy', href: '/privacy' },
     { name: 'Terms of Service', href: '/terms' },
     { name: 'Cookie Policy', href: '/cookies' },
     { name: 'Accessibility', href: '/accessibility' },
   ];
 
+  const legalLinks = [
+    { name: 'Privacy', href: '/privacy' },
+    { name: 'Terms', href: '/terms' },
+    { name: 'Cookies', href: '/cookies' },
+    { name: 'Accessibility', href: '/accessibility' },
+    { name: 'Contact', href: '/contact' },
+  ];
+
   return (
     <footer 
       role="contentinfo" 
       aria-label="Site Footer"
-      className="relative overflow-hidden bg-[#020617] text-white selection:bg-[#14b8a6]/30 selection:text-white border-t border-white/[0.08]"
+      className="relative overflow-visible bg-[#020617] text-white selection:bg-[#14b8a6]/30 selection:text-white border-t border-white/[0.08]"
     >
-      {/* Subtle Background Glow Accent Gradients */}
+      {/* Soft Teal Aurora Glow Background Accent */}
       <div 
         aria-hidden="true" 
         className="pointer-events-none absolute -top-40 -left-40 h-[450px] w-[450px] rounded-full bg-[#14b8a6]/10 blur-[130px]" 
@@ -146,14 +154,14 @@ export const Footer: React.FC<FooterProps> = ({ currentTheme = 'dark', onThemeTo
         className="pointer-events-none absolute bottom-0 right-0 h-[400px] w-[500px] rounded-full bg-[#0d9488]/10 blur-[140px]" 
       />
 
-      {/* Modern Mesh Grid Overlay */}
+      {/* Modern Radial Gradient & Mesh Grid Overlay */}
       <div 
         aria-hidden="true" 
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.05),rgba(255,255,255,0))]" 
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(20,184,166,0.06),rgba(255,255,255,0))]" 
       />
 
       <motion.div 
-        className="container relative mx-auto px-4 pt-16 pb-12 sm:px-6 lg:px-8 max-w-7xl"
+        className="container relative mx-auto px-4 pt-16 pb-12 sm:px-6 lg:px-8 max-w-7xl overflow-visible"
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
@@ -217,9 +225,7 @@ export const Footer: React.FC<FooterProps> = ({ currentTheme = 'dark', onThemeTo
                       to={link.href}
                       className="group inline-flex items-center text-sm text-white/65 hover:text-white transition-colors duration-200 focus-visible:ring-1 focus-visible:ring-[#14b8a6] rounded"
                     >
-                      <motion.span 
-                        className="inline-block transition-transform duration-200 group-hover:translate-x-1"
-                      >
+                      <motion.span className="inline-block transition-transform duration-200 group-hover:translate-x-1">
                         {link.name}
                       </motion.span>
                       {link.badge && (
@@ -273,11 +279,6 @@ export const Footer: React.FC<FooterProps> = ({ currentTheme = 'dark', onThemeTo
                       <motion.span className="inline-block transition-transform duration-200 group-hover:translate-x-1">
                         {link.name}
                       </motion.span>
-                      {link.badge && (
-                        <span className="ml-2 px-1.5 py-0.5 text-[10px] font-semibold rounded-md bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                          {link.badge}
-                        </span>
-                      )}
                     </Link>
                   </li>
                 ))}
@@ -319,7 +320,6 @@ export const Footer: React.FC<FooterProps> = ({ currentTheme = 'dark', onThemeTo
                 whileTap={{ scale: 0.97 }}
                 className="relative w-full h-11 rounded-xl bg-gradient-to-r from-[#14b8a6] to-[#0d9488] hover:from-[#2dd4bf] hover:to-[#14b8a6] text-white text-sm font-semibold shadow-[0_0_20px_rgba(20,184,166,0.3)] hover:shadow-[0_0_25px_rgba(45,212,191,0.5)] transition-all duration-300 flex items-center justify-center gap-2 overflow-hidden border border-white/20 disabled:opacity-75 focus-visible:ring-2 focus-visible:ring-white"
               >
-                {/* Micro Light Shimmer Effect */}
                 <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full hover:translate-x-full transition-transform duration-1000" />
                 
                 {isSubmitting ? (
@@ -346,116 +346,108 @@ export const Footer: React.FC<FooterProps> = ({ currentTheme = 'dark', onThemeTo
 
         </div>
 
-        {/* Horizontal Glass Divider */}
-        <div className="h-px w-full bg-gradient-to-r from-transparent via-white/[0.12] to-transparent my-4" />
+        {/* Thin Gradient Top Divider */}
+        <div className="relative mb-6 h-px w-full bg-gradient-to-r from-transparent via-[#14b8a6]/30 to-transparent" />
 
-        {/* Bottom Section */}
-        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-white/60">
-          
-          {/* Left Side: Copyright & Credits */}
-          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-center sm:text-left">
-            <span>© 2026 FitTracker</span>
-            <span className="hidden sm:inline text-white/20">•</span>
-            <span className="inline-flex items-center gap-1.5">
-              Made with <Heart className="h-3.5 w-3.5 text-rose-500 fill-rose-500 animate-pulse" /> using AI
-            </span>
-          </div>
+        {/* --------------------------------------------------------- */}
+        {/* ULTRA-MINIMAL, ELEGANT BOTTOM LEGAL BAR                    */}
+        {/* --------------------------------------------------------- */}
+        <motion.div 
+          ref={bottomBarRef}
+          onMouseMove={handleMouseMove}
+          onMouseEnter={() => setIsHoveringBar(true)}
+          onMouseLeave={() => setIsHoveringBar(false)}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="relative group rounded-2xl sm:rounded-3xl border border-white/[0.08] bg-[#030914]/80 backdrop-blur-2xl p-5 sm:p-6 shadow-[0_15px_40px_rgba(0,0,0,0.6),0_0_1px_rgba(255,255,255,0.1)] hover:border-[#14b8a6]/30 transition-all duration-500 overflow-visible z-20"
+        >
+          {/* Subtle Mouse-Follow Spotlight Lighting */}
+          <div 
+            className="pointer-events-none absolute -inset-px rounded-2xl sm:rounded-3xl transition-opacity duration-500"
+            style={{
+              opacity: isHoveringBar ? 1 : 0,
+              background: `radial-gradient(450px circle at ${mousePos.x}px ${mousePos.y}px, rgba(20, 184, 166, 0.08), transparent 80%)`,
+            }}
+          />
 
-          {/* Right Side: Version, Status, Legal & Preferences */}
-          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
+          {/* Thin Glass Reflection Line */}
+          <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+
+          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-8 text-xs font-normal">
             
-            {/* Version Badge */}
-            <span className="px-2 py-0.5 text-[11px] font-mono font-medium rounded-full bg-white/[0.05] border border-white/10 text-white/70">
-              v2.1
-            </span>
-
-            {/* System Status Indicator */}
-            <Link 
-              to="/status" 
-              className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium hover:bg-emerald-500/20 transition-all"
-            >
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-              </span>
-              <span>System Status</span>
-            </Link>
-
-            <Link to="/privacy" className="hover:text-white transition-colors">
-              Privacy
-            </Link>
-            <Link to="/terms" className="hover:text-white transition-colors">
-              Terms
-            </Link>
-
-            {/* Language Selector Dropdown */}
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setIsLangOpen(!isLangOpen)}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.08] hover:border-white/20 text-white/70 hover:text-white text-xs transition-all focus-visible:ring-1 focus-visible:ring-[#14b8a6]"
-                aria-expanded={isLangOpen}
-                aria-label="Select language"
-              >
-                <Globe className="h-3.5 w-3.5 text-white/50" />
-                <span>{selectedLanguage}</span>
-                <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${isLangOpen ? 'rotate-180' : ''}`} />
-              </button>
-
-              <AnimatePresence>
-                {isLangOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    transition={{ duration: 0.15 }}
-                    className="absolute right-0 bottom-full mb-2 w-36 rounded-xl bg-[#07111f] border border-white/10 shadow-2xl backdrop-blur-xl p-1 z-50 overflow-hidden"
-                  >
-                    {languages.map((lang) => (
-                      <button
-                        key={lang.code}
-                        onClick={() => {
-                          setSelectedLanguage(lang.name);
-                          setIsLangOpen(false);
-                          toast.info(`Language set to ${lang.name}`);
-                        }}
-                        className={`w-full flex items-center justify-between px-3 py-1.5 text-xs rounded-lg transition-colors ${
-                          selectedLanguage === lang.name 
-                            ? 'bg-[#14b8a6]/20 text-[#2dd4bf] font-medium' 
-                            : 'text-white/70 hover:text-white hover:bg-white/[0.06]'
-                        }`}
-                      >
-                        <span className="flex items-center gap-2">
-                          <span>{lang.flag}</span>
-                          <span>{lang.name}</span>
-                        </span>
-                      </button>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+            {/* LEFT: Copyright Notice */}
+            <div className="flex items-center justify-center lg:justify-start gap-2.5 text-white/50 text-center lg:text-left whitespace-nowrap">
+              <span className="font-medium text-white/70">© 2026 FitTracker. All rights reserved.</span>
             </div>
 
-            {/* Theme Toggle Button */}
-            {onThemeToggle && (
-              <button
-                type="button"
-                onClick={onThemeToggle}
-                className="p-1.5 rounded-lg bg-white/[0.04] border border-white/[0.08] hover:border-white/20 text-white/70 hover:text-white transition-all focus-visible:ring-1 focus-visible:ring-[#14b8a6]"
-                aria-label="Toggle Theme"
+            {/* CENTER: Legal Links (Privacy, Terms, Cookies, Accessibility, Contact) */}
+            <nav aria-label="Legal navigation" className="flex items-center justify-center gap-5 sm:gap-8 whitespace-nowrap">
+              {legalLinks.map((link, index) => (
+                <React.Fragment key={link.name}>
+                  <div className="relative group/link py-1">
+                    <Link
+                      to={link.href}
+                      onMouseEnter={() => setHoveredLegal(link.name)}
+                      onMouseLeave={() => setHoveredLegal(null)}
+                      className="relative inline-block text-white/65 hover:text-white transition-colors duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#14b8a6] rounded"
+                    >
+                      <motion.span
+                        whileHover={{ y: -2 }}
+                        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                        className="inline-block hover:bg-gradient-to-r hover:from-white hover:to-[#2dd4bf] hover:bg-clip-text hover:text-transparent font-medium"
+                      >
+                        {link.name}
+                      </motion.span>
+
+                      {/* Animated Teal Underline with Glow */}
+                      {hoveredLegal === link.name && (
+                        <motion.span
+                          layoutId="legalUnderline"
+                          initial={{ opacity: 0, scaleX: 0 }}
+                          animate={{ opacity: 1, scaleX: 1 }}
+                          exit={{ opacity: 0, scaleX: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="absolute -bottom-0.5 left-0 right-0 h-[1.5px] bg-gradient-to-r from-[#14b8a6] to-[#2dd4bf] rounded-full shadow-[0_0_8px_rgba(45,212,191,0.8)]"
+                        />
+                      )}
+                    </Link>
+                  </div>
+
+                  {/* Animated Subtle Separator Dot */}
+                  {index < legalLinks.length - 1 && (
+                    <motion.span 
+                      animate={{ opacity: [0.2, 0.6, 0.2] }} 
+                      transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }} 
+                      className="h-1 w-1 rounded-full bg-[#14b8a6]/40 inline-block" 
+                    />
+                  )}
+                </React.Fragment>
+              ))}
+            </nav>
+
+            {/* FAR RIGHT: ONLY Back To Top Button (Unmodified) */}
+            <div className="flex items-center justify-end">
+              <motion.button
+                onClick={scrollToTop}
+                whileHover={{ scale: 1.1, y: -2 }}
+                whileTap={{ scale: 0.92 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                className="relative flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-gradient-to-br from-white/10 via-white/[0.04] to-transparent border border-[#14b8a6]/40 hover:border-[#2dd4bf] backdrop-blur-xl text-white shadow-[0_0_15px_rgba(20,184,166,0.2)] hover:shadow-[0_0_25px_rgba(45,212,191,0.5)] transition-all duration-300 group/topbtn focus-visible:ring-2 focus-visible:ring-[#14b8a6]"
+                aria-label="Scroll back to top"
               >
-                {currentTheme === 'dark' ? (
-                  <Moon className="h-3.5 w-3.5 text-teal-400" />
-                ) : (
-                  <Sun className="h-3.5 w-3.5 text-amber-400" />
-                )}
-              </button>
-            )}
+                <ArrowUp className="h-4 w-4 text-[#2dd4bf] group-hover/topbtn:-translate-y-0.5 transition-transform duration-200" />
+                <span className="absolute inset-0 rounded-full bg-[#14b8a6]/20 animate-ping opacity-0 group-hover/topbtn:opacity-30 transition-opacity" />
+              </motion.button>
+            </div>
 
           </div>
+        </motion.div>
 
-        </div>
       </motion.div>
     </footer>
   );
 };
+
+export default Footer;

@@ -207,26 +207,6 @@ export const TestimonialsSection: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
-  // Initialize Lenis Smooth Scroll
-  useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smoothWheel: true,
-    });
-
-    function raf(time: number) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-
-    requestAnimationFrame(raf);
-
-    return () => {
-      lenis.destroy();
-    };
-  }, []);
-
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start end', 'end start'],
@@ -252,11 +232,17 @@ export const TestimonialsSection: React.FC = () => {
 
   return (
     <section 
+      id="testimonials"
       ref={containerRef}
       role="region" 
       aria-label="Community Testimonials"
-      className="relative overflow-hidden bg-[#020617] py-24 md:py-32 selection:bg-[#14b8a6]/30 selection:text-white border-t border-white/[0.06]"
+      className="relative overflow-hidden bg-[#020617] pt-8 pb-20 lg:pt-12 lg:pb-28 selection:bg-[#14b8a6]/30 selection:text-white"
     >
+      {/* Top Ambient Aurora Glow Transition */}
+      <div 
+        aria-hidden="true" 
+        className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-[320px] w-[750px] rounded-full bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(20,184,166,0.15),transparent_70%)] blur-[100px]" 
+      />
       {/* Background Floating Blobs with Parallax Effect */}
       <motion.div 
         style={{ y: blobY1 }}

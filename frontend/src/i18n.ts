@@ -1,30 +1,44 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
-// Import your translation files
+// Import translation files
 import translationEN from './locales/en/translation.json';
 import translationHI from './locales/hi/translation.json';
+import translationMR from './locales/mr/translation.json';
+import translationES from './locales/es/translation.json';
 
-// Create a resources object
+const getSavedLanguage = (): string => {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('fit_tracker_language');
+    if (saved && ['en', 'hi', 'mr', 'es'].includes(saved)) {
+      return saved;
+    }
+  }
+  return 'en';
+};
+
 const resources = {
-  en: {
-    translation: translationEN,
-  },
-  hi: {
-    translation: translationHI,
-  },
+  en: { translation: translationEN },
+  hi: { translation: translationHI },
+  mr: { translation: translationMR },
+  es: { translation: translationES },
 };
 
 i18n
-  .use(initReactI18next) // passes i18n down to react-i18next
+  .use(initReactI18next)
   .init({
     resources,
-    lng: 'en', // default language
-    fallbackLng: 'en', // use English if the chosen language translation is missing
-
+    lng: getSavedLanguage(),
+    fallbackLng: 'en',
     interpolation: {
-      escapeValue: false, // react already safes from xss
+      escapeValue: false,
     },
   });
+
+i18n.on('languageChanged', (lng) => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('fit_tracker_language', lng);
+  }
+});
 
 export default i18n;

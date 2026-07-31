@@ -1,0 +1,17 @@
+{
+  "name": "FitTracker - AI Health & Fitness Platform",
+  "short_name": "FitTracker",
+  "description": "AI-powered health and fitness tracking, personalized workout planning, and real-time telemetry.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#14b8a6",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

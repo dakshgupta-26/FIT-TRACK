@@ -24,14 +24,9 @@ const getTimeBasedGreeting = () => {
 export function PersonalizedGreeting() {
   const [quote, setQuote] = useState('');
   const { currentUser } = useAuth();
-  const { profileImageUrl, loadUserProfileImage } = useProfileImageMongo();
+  const { profileImageUrl } = useProfileImageMongo();
   const greeting = getTimeBasedGreeting();
   const GreetingIcon = greeting.icon;
-
-  // Load user profile image on component mount
-  React.useEffect(() => {
-    loadUserProfileImage();
-  }, [currentUser]);
 
   // Get user's display name or fallback to email or default
   const getUserName = () => {
@@ -67,7 +62,7 @@ export function PersonalizedGreeting() {
 
   return (
     <Card className="relative overflow-hidden bg-gradient-to-r from-primary/10 via-accent/10 to-secondary/10 border-0 shadow-lg">
-      <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-accent/5 animate-pulse-gentle"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-accent/5 animate-pulse-gentle" />
       <div className="relative p-6">
         <div className="flex items-center gap-4">
           <Avatar className="h-16 w-16 ring-2 ring-primary/20 ring-offset-2 ring-offset-background">
@@ -99,3 +94,5 @@ export function PersonalizedGreeting() {
     </Card>
   );
 }
+
+export default PersonalizedGreeting;

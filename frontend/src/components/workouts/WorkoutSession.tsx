@@ -44,6 +44,18 @@ const WorkoutSession: React.FC<WorkoutSessionProps> = ({ workout, onEndWorkout, 
   // --- YouTube API Integration ---
   const playerRef = useRef<any>(null); // Ref to hold the YouTube player instance
 
+  // --- Updated Music Controls ---
+  const handleNextTrack = React.useCallback((shouldPlay = false) => {
+    setCurrentTrackIndex(prev => {
+      const nextIndex = (prev + 1) % workoutMusicPlaylist.length;
+      if (playerRef.current) {
+        playerRef.current.loadVideoById(workoutMusicPlaylist[nextIndex].videoId);
+        if (!shouldPlay) playerRef.current.pauseVideo();
+      }
+      return nextIndex;
+    });
+  }, []);
+
   useEffect(() => {
     // This function initializes the YouTube player
     const initializePlayer = () => {
@@ -85,23 +97,7 @@ const WorkoutSession: React.FC<WorkoutSessionProps> = ({ workout, onEndWorkout, 
     return () => {
       playerRef.current?.destroy();
     };
-  }, []); // Run only once on component mount
-
-  // Workout timer logic
-  useEffect(() => { if (sessionState.isPlaying && !sessionState.isResting && sessionState.timeRemaining > 0) { intervalRef.current = setInterval(() => { setSessionState(prev => ({ ...prev, timeRemaining: prev.timeRemaining - 1, totalTimeElapsed: prev.totalTimeElapsed + 1, })); }, 1000); } else if (intervalRef.current) { clearInterval(intervalRef.current); } return () => { if (intervalRef.current) clearInterval(intervalRef.current); }; }, [sessionState.isPlaying, sessionState.isResting, sessionState.timeRemaining]);
-  useEffect(() => { if (sessionState.isResting && sessionState.restTimeRemaining > 0) { intervalRef.current = setInterval(() => { setSessionState(prev => ({ ...prev, restTimeRemaining: prev.restTimeRemaining - 1 })); }, 1000); } else if (sessionState.isResting && sessionState.restTimeRemaining === 0) { setSessionState(prev => ({ ...prev, isResting: false, restTimeRemaining: 30, currentSet: prev.currentSet + 1, timeRemaining: 0 })); } return () => { if (intervalRef.current) clearInterval(intervalRef.current); }; }, [sessionState.isResting, sessionState.restTimeRemaining]);
-
-  // --- Updated Music Controls ---
-  const handleNextTrack = (shouldPlay = false) => {
-    setCurrentTrackIndex(prev => {
-      const nextIndex = (prev + 1) % workoutMusicPlaylist.length;
-      if (playerRef.current) {
-        playerRef.current.loadVideoById(workoutMusicPlaylist[nextIndex].videoId);
-        if (!shouldPlay) playerRef.current.pauseVideo();
-      }
-      return nextIndex;
-    });
-  };
+  }, [currentTrackIndex, handleNextTrack]);
 
   const handlePrevTrack = () => {
     setCurrentTrackIndex(prev => {

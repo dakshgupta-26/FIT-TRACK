@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 
 export interface HealthMetric {
@@ -27,7 +27,7 @@ export const useHealthMetrics = () => {
   const [error, setError] = useState<string | null>(null);
   const { currentUser } = useAuth();
 
-  const fetchMetrics = async (type?: string, limit = 100) => {
+  const fetchMetrics = useCallback(async (type?: string, limit = 100) => {
     if (!currentUser?.uid) return;
 
     setLoading(true);
@@ -51,9 +51,9 @@ export const useHealthMetrics = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentUser?.uid]);
 
-  const fetchSummary = async () => {
+  const fetchSummary = useCallback(async () => {
     if (!currentUser?.uid) return;
 
     try {
@@ -68,7 +68,7 @@ export const useHealthMetrics = () => {
     } catch (err) {
       console.error('Error fetching health metrics summary:', err);
     }
-  };
+  }, [currentUser?.uid]);
 
   const addMetric = async (type: string, value: number, unit: string, date: string, notes?: string) => {
     if (!currentUser?.uid) throw new Error('User not authenticated');
@@ -160,7 +160,7 @@ export const useHealthMetrics = () => {
       fetchMetrics();
       fetchSummary();
     }
-  }, [currentUser?.uid]);
+  }, [currentUser?.uid, fetchMetrics, fetchSummary]);
 
   return {
     metrics,

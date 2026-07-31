@@ -1,4 +1,52 @@
 {
+  "nav": {
+    "features": "Features",
+    "community": "Community",
+    "pricing": "Pricing",
+    "faq": "FAQ",
+    "roadmap": "Roadmap",
+    "sign_in": "Sign In",
+    "get_started": "Get Started Free"
+  },
+  "hero": {
+    "badge": "AI-POWERED HEALTH ECOSYSTEM v2.5",
+    "title_part1": "Your Personal AI",
+    "title_part2": "Health & Fitness Intelligence",
+    "subtitle": "Transform your wellness journey with real-time biometric analysis, intelligent workout creation, computer vision meal tracking, and predictive recovery insights.",
+    "start_free": "Start Free Trial",
+    "view_demo": "Explore AI Features"
+  },
+  "pricing": {
+    "badge": "TRANSPARENT PRICING",
+    "title": "Invest in Your Long-Term Health",
+    "subtitle": "Start free today. Upgrade anytime for unlimited AI insights, smartwatch syncing, and personalized coaching.",
+    "free_plan": "Free Plan",
+    "pro_plan": "Pro AI Plan",
+    "monthly": "Monthly",
+    "annually": "Annually (Save 20%)",
+    "start_free_btn": "Start Free",
+    "upgrade_pro_btn": "Upgrade to Pro AI"
+  },
+  "footer": {
+    "tagline": "AI-powered health and fitness platform helping people build healthier lives through intelligent tracking, nutrition insights, workout planning, and personalized coaching.",
+    "product": "Product",
+    "resources": "Resources",
+    "company": "Company",
+    "stay_updated": "Stay Updated",
+    "newsletter_sub": "Join 50,000+ fitness enthusiasts receiving monthly product features, health AI insights & tips.",
+    "subscribe": "Subscribe",
+    "subscribed": "Subscribed!",
+    "no_spam": "No spam. Monthly product updates only.",
+    "copyright": "© 2026 FitTracker. All rights reserved.",
+    "theme_dark": "Dark",
+    "theme_light": "Light"
+  },
+  "legal": {
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "cookies": "Cookies",
+    "accessibility": "Accessibility"
+  },
   "sidebar": {
     "dashboard": "Dashboard",
     "workouts": "Workouts",
@@ -6,7 +54,6 @@
     "health_metrics": "Health Metrics",
     "goals": "Goals",
     "music": "Music",
-    "progress": "Progress",
     "nearby_gyms": "Nearby Gyms",
     "profile": "Profile",
     "settings": "Settings"
@@ -43,29 +90,6 @@
       "title": "General Settings", "description": "Configure your basic app preferences.",
       "language": "Language", "timezone": "Timezone", "auto_save": "Auto-save data",
       "weekly_reports": "Weekly Reports", "save_button": "Save General Settings"
-    },
-    "security": {
-      "title": "Security", "description": "Manage your account security and password.",
-      "change_password": "Change Password", "current_password": "Current Password",
-      "new_password": "New Password", "confirm_new_password": "Confirm New Password",
-      "two_factor": "Two-Factor Authentication (2FA)", "two_factor_desc": "Add an extra layer of security.",
-      "enable_2fa": "Enable 2FA", "update_password_button": "Update Password"
-    },
-    "notifications": {
-        "title": "Notifications", "description": "Control how you receive notifications.",
-        "push": "Push Notifications", "workout_reminders": "Workout Reminders",
-        "meal_reminders": "Meal Reminders", "achievement_milestones": "Achievement Milestones",
-        "save_button": "Save Notifications"
-    },
-    "appearance": {
-        "title": "Appearance", "description": "Customize the look and feel of the app.",
-        "theme": "Theme", "accent_color": "Accent Color", "save_button": "Save Appearance"
-    },
-    "integrations": { "title": "Integrations", "description": "Connect external services.", "coming_soon": "Integrations are coming soon!" },
-    "data_privacy": {
-        "title": "Data & Privacy", "description": "Manage your personal data.",
-        "export_data": "Export Your Data", "export_button": "Export Data", "danger_zone": "Danger Zone",
-        "delete_desc": "Permanently delete your account and all data.", "delete_button": "Delete Account"
     }
   }
 }

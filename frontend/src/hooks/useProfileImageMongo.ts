@@ -1,6 +1,6 @@
 // src/hooks/useProfileImageMongo.ts (Recommended Secure Version)
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -12,13 +12,13 @@ export const useProfileImageMongo = () => {
   const { currentUser, updateUserData } = useAuth();
   const { toast } = useToast();
 
-  const loadUserProfileImage = () => {
+  const loadUserProfileImage = useCallback(() => {
     if (currentUser?.profileImageUrl) {
       setProfileImageUrl(`http://localhost:5000${currentUser.profileImageUrl}`);
     } else {
       setProfileImageUrl("");
     }
-  };
+  }, [currentUser?.profileImageUrl]);
 
   const uploadProfileImage = async (file: File) => {
     if (!currentUser) return;
@@ -98,7 +98,7 @@ export const useProfileImageMongo = () => {
 
   useEffect(() => {
     loadUserProfileImage();
-  }, [currentUser]);
+  }, [loadUserProfileImage]);
 
   return {
     isUploading,
