@@ -6,10 +6,11 @@ import { AuthCard } from './AuthCard';
 import { Sparkles } from 'lucide-react';
 
 interface AuthContainerProps {
-  initialMode: 'login' | 'signup';
+  initialMode?: 'login' | 'signup';
+  children?: React.ReactNode;
 }
 
-export const AuthContainer: React.FC<AuthContainerProps> = ({ initialMode }) => {
+export const AuthContainer: React.FC<AuthContainerProps> = ({ initialMode = 'signup', children }) => {
   // Staggered Spring Animation Variants
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -85,7 +86,7 @@ export const AuthContainer: React.FC<AuthContainerProps> = ({ initialMode }) => 
               One intelligent platform for fitness, nutrition, AI coaching, meal recognition, smartwatch telemetry, and predictive health insights.
             </motion.p>
 
-            {/* Floating Realistic iPhone Product Showcase (Entire phone visible, scaled ~430-450px) */}
+            {/* Floating Realistic iPhone Product Showcase */}
             <motion.div
               variants={itemFadeUp}
               className="w-full flex justify-center lg:justify-start pt-1"
@@ -94,10 +95,10 @@ export const AuthContainer: React.FC<AuthContainerProps> = ({ initialMode }) => 
             </motion.div>
           </div>
 
-          {/* ================= RIGHT SIDE: Authentication Card (42% width on desktop) ================= */}
+          {/* ================= RIGHT SIDE: Authentication Card or OTP Verification Card ================= */}
           <div className="w-full lg:w-[42%] flex justify-center lg:justify-end items-center max-h-full">
             <motion.div variants={cardVariants} className="w-full flex justify-center lg:justify-end">
-              <AuthCard initialMode={initialMode} />
+              {children || <AuthCard initialMode={initialMode} />}
             </motion.div>
           </div>
         </motion.div>

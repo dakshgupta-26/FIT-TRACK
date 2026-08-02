@@ -72,10 +72,10 @@ export const Navbar: React.FC = () => {
 
   const navItems = [
     { labelKey: 'nav.features', defaultLabel: 'Features', targetId: 'features' },
-    { labelKey: 'nav.pricing', defaultLabel: 'Pricing', targetId: 'pricing' },
     { labelKey: 'nav.community', defaultLabel: 'Community', targetId: 'testimonials' },
+    { labelKey: 'nav.pricing', defaultLabel: 'Pricing', targetId: 'pricing' },
+    { labelKey: 'nav.about', defaultLabel: 'About', targetId: 'about', path: '/about' },
     { labelKey: 'nav.faq', defaultLabel: 'FAQ', targetId: 'faq' },
-    { labelKey: 'nav.roadmap', defaultLabel: 'Roadmap', targetId: 'roadmap', path: '/roadmap' },
   ];
 
   return (

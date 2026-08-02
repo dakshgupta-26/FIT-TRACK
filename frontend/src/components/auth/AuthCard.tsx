@@ -47,7 +47,7 @@ export const AuthCard: React.FC<AuthCardProps> = ({ initialMode }) => {
   const [shakeKey, setShakeKey] = useState(0);
 
   const navigate = useNavigate();
-  const { login, signup, loginWithGoogle } = useAuth();
+  const { login, signup, loginWithGoogle, loginWithMicrosoft } = useAuth();
 
   useEffect(() => {
     setMode(initialMode);
@@ -106,14 +106,18 @@ export const AuthCard: React.FC<AuthCardProps> = ({ initialMode }) => {
     try {
       if (mode === 'login') {
         await login(email, password);
+        setIsSuccess(true);
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1000);
       } else {
         await signup(email, password, { firstName, lastName, birthDate });
+        sessionStorage.setItem('pendingVerificationEmail', email);
+        setIsSuccess(true);
+        setTimeout(() => {
+          navigate('/signup/verify', { state: { email } });
+        }, 600);
       }
-
-      setIsSuccess(true);
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, 1000);
     } catch (err: any) {
       setIsLoading(false);
       setErrorMessage(err.message || 'Authentication failed. Please check credentials.');
@@ -135,9 +139,18 @@ export const AuthCard: React.FC<AuthCardProps> = ({ initialMode }) => {
     }
   };
 
-  const handleMicrosoftAuth = () => {
-    setErrorMessage('Microsoft authentication initialized.');
-    setShakeKey((prev) => prev + 1);
+  const handleMicrosoftAuth = async () => {
+    setIsLoading(true);
+    setErrorMessage(null);
+    try {
+      await loginWithMicrosoft();
+      setIsSuccess(true);
+      setTimeout(() => navigate('/dashboard'), 1000);
+    } catch (err: any) {
+      setIsLoading(false);
+      setErrorMessage(err.message || 'Microsoft authentication failed.');
+      setShakeKey((prev) => prev + 1);
+    }
   };
 
   return (
@@ -431,12 +444,12 @@ export const AuthCard: React.FC<AuthCardProps> = ({ initialMode }) => {
           {isLoading ? (
             <div className="flex items-center gap-1.5 text-slate-950">
               <Loader2 className="w-4 h-4 animate-spin" />
-              <span>Authenticating...</span>
+              <span>{mode === 'signup' ? 'Sending OTP...' : 'Authenticating...'}</span>
             </div>
           ) : isSuccess ? (
             <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="flex items-center gap-1.5">
               <Check className="w-4 h-4 stroke-[3]" />
-              <span>Access Granted</span>
+              <span>{mode === 'signup' ? 'Verification Code Sent!' : 'Access Granted'}</span>
             </motion.div>
           ) : (
             <div className="flex items-center gap-1.5">

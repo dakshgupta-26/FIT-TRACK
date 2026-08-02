@@ -3,29 +3,33 @@ import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema(
   {
-    // uid will now be populated by our backend, referencing MongoDB's _id
-    uid: { type: String, unique: true },
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
+    uid: { type: String },
+    firstName: { type: String, required: [true, "First name is required"] },
+    lastName: { type: String, required: [true, "Last name is required"] },
     email: {
       type: String,
-      required: true,
+      required: [true, "Email address is required"],
       unique: true,
       lowercase: true,
-      match: [/\S+@\S+\.\S+/, "is invalid"],
+      trim: true,
+      match: [/\S+@\S+\.\S+/, "Please enter a valid email address"],
     },
     password: {
       type: String,
-      required: true,
-      minlength: 6,
-      select: false, // Don't send password in API responses by default
+      required: [true, "Password is required"],
+      minlength: [6, "Password must be at least 6 characters long"],
+      select: false,
     },
-    birthDate: { type: Date },
+    birthDate: {
+      type: Date,
+      default: null,
+      set: (val) => (val === "" || val === undefined ? null : val),
+    },
     gender: String,
     height: String,
     weight: String,
     profileImageUrl: String,
-    // Default settings remain the same
+    authProvider: { type: String, default: "local" },
     language: { type: String, default: "en" },
     timezone: { type: String, default: "utc" },
     autoSave: { type: Boolean, default: true },
@@ -39,29 +43,36 @@ const userSchema = new mongoose.Schema(
     },
     theme: { type: String, default: "auto" },
     accentColor: { type: String, default: "blue" },
+    lastLoginAt: { type: Date, default: null },
+    previousLoginAt: { type: Date, default: null },
+    knownDevices: [
+      {
+        userAgent: String,
+        ip: String,
+        deviceString: String,
+        firstSeenAt: { type: Date, default: Date.now },
+        lastSeenAt: { type: Date, default: Date.now },
+      },
+    ],
   },
   { timestamps: true }
 );
 
-// Middleware to hash password before saving and set the UID
 userSchema.pre("save", async function (next) {
+  if (this.isNew && !this.uid) {
+    this.uid = this._id.toString();
+  }
   if (!this.isModified("password")) {
     return next();
   }
-
-  // Hash the password
+  if (this.password && (this.password.startsWith("$2a$") || this.password.startsWith("$2b$"))) {
+    return next();
+  }
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
-
-  // Set uid from the document's _id
-  if (this.isNew) {
-    this.uid = this._id.toString();
-  }
-
   next();
 });
 
-// Method to compare entered password with the hashed password
 userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };

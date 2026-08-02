@@ -48,7 +48,7 @@ const SpotifyPlayer: React.FC<SpotifyPlayerProps> = ({
       const token = await getSpotifyAccessToken();
       
       const spotifyPlayer = new window.Spotify.Player({
-        name: 'Health Bloom Dashboard',
+        name: 'FitTracker OS Player',
         getOAuthToken: (cb: (token: string) => void) => {
           cb(token);
         },

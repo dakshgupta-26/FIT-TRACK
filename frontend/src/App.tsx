@@ -17,6 +17,7 @@ import Music from "./pages/Music";
 import NearbyGyms from "./pages/NearbyGyms";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import SignupVerify from "./pages/SignupVerify";
 import NotFound from "./pages/NotFound";
 import PlaylistCreator from "./pages/PlaylistCreator";
 import Layout from "./Layout";
@@ -40,7 +41,6 @@ import BlogPage from './pages/BlogPage';
 import CommunityPage from './pages/CommunityPage';
 import ChangelogPage from './pages/ChangelogPage';
 import StatusPage from './pages/StatusPage';
-import RoadmapPage from './pages/RoadmapPage';
 import ScrollToTop from './components/ScrollToTop';
 
 const queryClient = new QueryClient();
@@ -123,9 +123,7 @@ const AppContent = () => {
         <Route path="/support" element={<HelpCenter />} />
         <Route path="/docs" element={<DocumentationPage />} />
         <Route path="/blog" element={<BlogPage />} />
-        <Route path="/community" element={<CommunityPage />} />
         <Route path="/changelog" element={<ChangelogPage />} />
-        <Route path="/roadmap" element={<RoadmapPage />} />
         <Route path="/status" element={<StatusPage />} />
         <Route path="/login" element={
           <PublicRoute>
@@ -135,6 +133,16 @@ const AppContent = () => {
         <Route path="/signup" element={
           <PublicRoute>
             <Signup />
+          </PublicRoute>
+        } />
+        <Route path="/signup/verify" element={
+          <PublicRoute>
+            <SignupVerify />
+          </PublicRoute>
+        } />
+        <Route path="/verify-otp" element={
+          <PublicRoute>
+            <SignupVerify />
           </PublicRoute>
         } />
 
@@ -209,6 +217,13 @@ const AppContent = () => {
           <ProtectedRoute>
             <Layout theme={theme} setTheme={handleThemeChange}>
               <NearbyGyms />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/community" element={
+          <ProtectedRoute>
+            <Layout theme={theme} setTheme={handleThemeChange}>
+              <CommunityPage />
             </Layout>
           </ProtectedRoute>
         } />

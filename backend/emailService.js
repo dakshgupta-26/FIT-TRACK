@@ -1,596 +1,581 @@
 import nodemailer from 'nodemailer';
 import handlebars from 'handlebars';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import { emailConfig } from './email-config.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Parse user agent to get real device information
-const parseUserAgent = (userAgent) => {
-  try {
-    let browser = 'Unknown Browser';
-    let os = 'Unknown OS';
-    let device = 'Unknown Device';
-
-    // Detect Browser
-    if (userAgent.includes('Chrome') && !userAgent.includes('Edg')) {
-      const chromeMatch = userAgent.match(/Chrome\/(\d+\.\d+)/);
-      browser = chromeMatch ? `Google Chrome ${chromeMatch[1]}` : 'Google Chrome';
-    } else if (userAgent.includes('Firefox')) {
-      const firefoxMatch = userAgent.match(/Firefox\/(\d+\.\d+)/);
-      browser = firefoxMatch ? `Mozilla Firefox ${firefoxMatch[1]}` : 'Mozilla Firefox';
-    } else if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) {
-      const safariMatch = userAgent.match(/Version\/(\d+\.\d+)/);
-      browser = safariMatch ? `Safari ${safariMatch[1]}` : 'Safari';
-    } else if (userAgent.includes('Edg')) {
-      const edgeMatch = userAgent.match(/Edg\/(\d+\.\d+)/);
-      browser = edgeMatch ? `Microsoft Edge ${edgeMatch[1]}` : 'Microsoft Edge';
-    } else if (userAgent.includes('Opera') || userAgent.includes('OPR')) {
-      const operaMatch = userAgent.match(/(?:Opera|OPR)\/(\d+\.\d+)/);
-      browser = operaMatch ? `Opera ${operaMatch[1]}` : 'Opera';
-    }
-
-    // Detect Operating System
-    if (userAgent.includes('Windows NT 10.0')) {
-      os = 'Windows 10/11';
-    } else if (userAgent.includes('Windows NT 6.3')) {
-      os = 'Windows 8.1';
-    } else if (userAgent.includes('Windows NT 6.1')) {
-      os = 'Windows 7';
-    } else if (userAgent.includes('Mac OS X')) {
-      const macMatch = userAgent.match(/Mac OS X (\d+[._]\d+)/);
-      os = macMatch ? `macOS ${macMatch[1].replace('_', '.')}` : 'macOS';
-    } else if (userAgent.includes('Linux')) {
-      os = 'Linux';
-    } else if (userAgent.includes('Android')) {
-      const androidMatch = userAgent.match(/Android (\d+\.\d+)/);
-      os = androidMatch ? `Android ${androidMatch[1]}` : 'Android';
-    } else if (userAgent.includes('iPhone') || userAgent.includes('iPad')) {
-      const iosMatch = userAgent.match(/OS (\d+[._]\d+)/);
-      os = iosMatch ? `iOS ${iosMatch[1].replace('_', '.')}` : 'iOS';
-    }
-
-    // Detect Device Type
-    if (userAgent.includes('Mobile') || userAgent.includes('Android') || userAgent.includes('iPhone')) {
-      device = 'Mobile Device';
-    } else if (userAgent.includes('Tablet') || userAgent.includes('iPad')) {
-      device = 'Tablet';
-    } else {
-      device = 'Desktop Computer';
-    }
-
-    return `${browser} on ${os} (${device})`;
-  } catch (error) {
-    console.error('Error parsing user agent:', error);
-    return userAgent || 'Unknown Device';
-  }
-};
-
-// Email configuration
+// Transporter with environment variable support & fallback
 const createTransporter = () => {
+  const host = process.env.SMTP_HOST;
+  const port = process.env.SMTP_PORT;
+  const user = process.env.SMTP_USER || emailConfig.SMTP_EMAIL;
+  const pass = process.env.SMTP_PASS || emailConfig.SMTP_PASSWORD;
+
+  if (host) {
+    return nodemailer.createTransport({
+      host,
+      port: Number(port) || 587,
+      secure: Number(port) === 465,
+      auth: { user, pass },
+      connectionTimeout: 10000,
+    });
+  }
+
   return nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: emailConfig.SMTP_EMAIL,
-      pass: emailConfig.SMTP_PASSWORD
-    }
+      user: user,
+      pass: pass,
+    },
+    connectionTimeout: 10000,
   });
 };
 
-// Load email templates
-const loadTemplate = (templateName) => {
-  const templatePath = path.join(__dirname, 'templates', `${templateName}.html`);
-  return fs.readFileSync(templatePath, 'utf8');
+/**
+ * Perform Startup SMTP Verification Check
+ */
+export const verifySmtpConnection = async () => {
+  try {
+    const transporter = createTransporter();
+    await transporter.verify();
+    console.log("✅ FIT TRACK Nodemailer SMTP Transporter connected & verified!");
+    return true;
+  } catch (error) {
+    console.warn("⚠️ FIT TRACK SMTP Transporter verification notice:", error.message);
+    return false;
+  }
 };
 
-// Welcome email template
+const getSenderHeader = () => {
+  const senderEmail = process.env.SMTP_USER || emailConfig.FROM_EMAIL || 'finplan26@gmail.com';
+  return `"FIT TRACK" <${senderEmail}>`;
+};
+
+// ============================================================================
+// TEMPLATE 1: OTP VERIFICATION EMAIL (Dark Glassmorphism Luxury Theme)
+// ============================================================================
+const otpEmailTemplate = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify your FitTracker AI account</title>
+  <style>
+    body { margin: 0; padding: 0; background-color: #04060a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #f1f5f9; }
+    .wrapper { width: 100%; background-color: #04060a; padding: 40px 10px; }
+    .main-card { max-width: 580px; margin: 0 auto; background: #090d16; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 24px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 40px rgba(20, 184, 166, 0.15); }
+    .header-banner { background: linear-gradient(135deg, #0d1527 0%, #061e27 100%); padding: 36px 30px 24px 30px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+    .logo-badge { display: inline-flex; align-items: center; background: rgba(20, 184, 166, 0.15); border: 1px solid rgba(45, 212, 191, 0.4); color: #2dd4bf; padding: 4px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+    .content-body { padding: 36px 32px; text-align: center; }
+    .headline { font-size: 26px; font-weight: 800; color: #ffffff; margin: 0 0 14px 0; }
+    .description { font-size: 15px; line-height: 1.6; color: #94a3b8; margin: 0 0 28px 0; }
+    .otp-box-wrapper { margin: 28px 0; padding: 24px 16px; background: linear-gradient(180deg, rgba(15, 23, 42, 0.9) 0%, rgba(6, 182, 212, 0.08) 100%); border: 1px solid rgba(45, 212, 191, 0.35); border-radius: 20px; box-shadow: 0 0 30px rgba(45, 212, 191, 0.2); }
+    .otp-code { font-family: 'Courier New', Courier, monospace; font-size: 42px; font-weight: 900; letter-spacing: 12px; color: #2dd4bf; text-shadow: 0 0 20px rgba(45, 212, 191, 0.6); margin: 0; }
+    .expiry-text { margin-top: 14px; font-size: 13px; color: #64748b; font-weight: 600; }
+    .security-notice { background: rgba(30, 41, 59, 0.6); border-left: 3px solid #2dd4bf; border-radius: 8px; padding: 14px 18px; margin: 28px 0 10px 0; text-align: left; font-size: 13px; color: #94a3b8; line-height: 1.5; }
+    .footer { background: #060910; padding: 28px 30px; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.06); }
+    .footer-links a { color: #2dd4bf; text-decoration: none; font-size: 12px; margin: 0 10px; }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="main-card">
+      <div class="header-banner">
+        <div style="font-size: 24px; font-weight: 900; color: #ffffff; letter-spacing: -0.5px; margin-bottom: 12px;">FIT TRACK <span style="color: #2dd4bf;">AI</span></div>
+        <div><span class="logo-badge">⚡ Verification Security</span></div>
+      </div>
+      <div class="content-body">
+        <h1 class="headline">Verify Your Email Address</h1>
+        <p class="description">Welcome to <strong>FitTracker AI</strong>.<br>Before creating your account, please verify your email with this single-use 6-digit OTP code.</p>
+        <div class="otp-box-wrapper">
+          <div class="otp-code">{{otp}}</div>
+          <div class="expiry-text">Valid for <span style="color: #38bdf8; font-weight: 700;">5 minutes</span></div>
+        </div>
+        <div class="security-notice">
+          <strong>🛡️ Security Note:</strong> If you did not request this verification code, please disregard this message. Account creation requires verification.
+        </div>
+      </div>
+      <div class="footer">
+        <div style="font-size: 14px; font-weight: 700; color: #cbd5e1; margin-bottom: 4px;">FIT TRACK AI</div>
+        <div class="footer-links"><a href="{{appUrl}}">Website</a> • <a href="{{appUrl}}/support">Support</a></div>
+        <div style="margin-top: 14px; font-size: 11px; color: #475569;">© {{year}} FIT TRACK AI. All rights reserved.</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+`;
+
+// ============================================================================
+// TEMPLATE 2: WELCOME EMAIL
+// ============================================================================
 const welcomeEmailTemplate = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to Health Bloom</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f8fafc;
-        }
-        .container {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 40px 30px;
-            text-align: center;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 28px;
-            font-weight: 700;
-        }
-        .header p {
-            margin: 10px 0 0 0;
-            opacity: 0.9;
-            font-size: 16px;
-        }
-        .content {
-            padding: 40px 30px;
-        }
-        .welcome-message {
-            font-size: 18px;
-            margin-bottom: 30px;
-            color: #2d3748;
-        }
-        .features {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin: 30px 0;
-        }
-        .feature {
-            text-align: center;
-            padding: 20px;
-            background: #f7fafc;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-        }
-        .feature-icon {
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-        .feature h3 {
-            margin: 0 0 10px 0;
-            color: #2d3748;
-            font-size: 16px;
-        }
-        .feature p {
-            margin: 0;
-            color: #718096;
-            font-size: 14px;
-        }
-        .cta-button {
-            display: inline-block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px 30px;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 600;
-            margin: 20px 0;
-            transition: transform 0.2s;
-        }
-        .cta-button:hover {
-            transform: translateY(-2px);
-        }
-        .footer {
-            background: #f7fafc;
-            padding: 30px;
-            text-align: center;
-            color: #718096;
-            font-size: 14px;
-        }
-        .social-links {
-            margin: 20px 0;
-        }
-        .social-links a {
-            color: #667eea;
-            text-decoration: none;
-            margin: 0 10px;
-        }
-        @media (max-width: 600px) {
-            .features {
-                grid-template-columns: 1fr;
-            }
-            .header, .content, .footer {
-                padding: 20px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎉 Welcome to FIT TRACK AI</title>
+  <style>
+    body { margin: 0; padding: 0; background-color: #04060a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #f1f5f9; }
+    .wrapper { width: 100%; background-color: #04060a; padding: 40px 10px; }
+    .main-card { max-width: 600px; margin: 0 auto; background: #090d16; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 24px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 50px rgba(20, 184, 166, 0.2); }
+    .hero-banner { background: linear-gradient(135deg, #091a27 0%, #042426 50%, #090d16 100%); padding: 40px 30px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+    .hero-badge { display: inline-block; background: rgba(45,212,191,0.2); border: 1px solid rgba(45, 212, 191, 0.4); color: #2dd4bf; padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-bottom: 16px; }
+    .hero-title { font-size: 30px; font-weight: 900; color: #ffffff; margin: 0 0 10px 0; }
+    .content-body { padding: 36px 32px; }
+    .cta-container { text-align: center; margin: 32px 0 28px 0; }
+    .btn-primary { display: inline-block; background: linear-gradient(135deg, #2dd4bf 0%, #06b6d4 100%); color: #04060a; font-size: 14px; font-weight: 800; padding: 14px 32px; border-radius: 12px; text-decoration: none; box-shadow: 0 0 25px rgba(45, 212, 191, 0.4); }
+    .feature-grid { display: table; width: 100%; margin-top: 24px; border-collapse: separate; border-spacing: 10px; }
+    .feature-cell { display: table-cell; width: 50%; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 16px; text-align: left; }
+    .feature-title { font-size: 13px; font-weight: 700; color: #2dd4bf; margin-bottom: 4px; }
+    .feature-desc { font-size: 12px; color: #94a3b8; line-height: 1.4; }
+    .profile-card { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(45, 212, 191, 0.25); border-radius: 16px; padding: 20px; margin-top: 24px; }
+    .profile-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.06); font-size: 13px; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🌟 Welcome to FIT-TRACK!</h1>
-            <p>Your journey to a healthier lifestyle starts now</p>
+  <div class="wrapper">
+    <div class="main-card">
+      <div class="hero-banner">
+        <span class="hero-badge">✨ VERIFIED & ACTIVE ACCOUNT</span>
+        <h1 class="hero-title">Welcome to FIT TRACK AI</h1>
+        <p style="color: #94a3b8; font-size: 15px; margin: 0;">Your Next-Gen AI Health Operating System</p>
+      </div>
+
+      <div class="content-body">
+        <p style="font-size: 16px; line-height: 1.6; color: #cbd5e1;">
+          Hello <strong>{{userName}}</strong>,<br><br>
+          Your email has been verified and your account is active. Explore your personalized dashboard and smart biometric telemetry below.
+        </p>
+
+        <div class="cta-container">
+          <a href="{{appUrl}}/dashboard" class="btn-primary">Go To Dashboard →</a>
         </div>
-        
-        <div class="content">
-            <div class="welcome-message">
-                <strong>Hi {{firstName}}!</strong><br>
-                Thank you for joining FIT-TRACK! We're excited to help you achieve your health and fitness goals.
-            </div>
-            
-            <div class="features">
-                <div class="feature">
-                    <div class="feature-icon">🎯</div>
-                    <h3>Smart Goal Tracking</h3>
-                    <p>Set and track personalized fitness goals with our intelligent system</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">📊</div>
-                    <h3>Progress Analytics</h3>
-                    <p>Monitor your progress with detailed insights and analytics</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">💪</div>
-                    <h3>Workout Plans</h3>
-                    <p>Access personalized workout routines and exercise plans</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">🥗</div>
-                    <h3>Nutrition Tracking</h3>
-                    <p>Track your meals and maintain a balanced diet</p>
-                </div>
-            </div>
-            
-            <div style="text-align: center;">
-                <a href="{{appUrl}}" class="cta-button">Start Your Journey</a>
-            </div>
-            
-            <div style="background: #e6fffa; border-left: 4px solid #38b2ac; padding: 20px; margin: 30px 0; border-radius: 4px;">
-                <strong>💡 Pro Tip:</strong> Complete your profile to get personalized recommendations and better insights into your health journey.
-            </div>
+
+        <div class="feature-grid">
+          <div class="feature-cell">
+            <div class="feature-title">🤖 AI Health Coach</div>
+            <div class="feature-desc">Real-time workout optimization & recovery insights.</div>
+          </div>
+          <div class="feature-cell">
+            <div class="feature-title">🥗 Smart Meal AI</div>
+            <div class="feature-desc">Instant photo macro recognition and nutrition tracking.</div>
+          </div>
         </div>
-        
-        <div class="footer">
-            <p><strong>FIT-TRACK Team</strong></p>
-            <p>Your health is our priority. We're here to support you every step of the way.</p>
-            
-            <div class="social-links">
-                <a href="#">Website</a> |
-                <a href="#">Support</a> |
-                <a href="#">Privacy Policy</a>
-            </div>
-            
-            <p style="margin-top: 20px; font-size: 12px; color: #a0aec0;">
-                This email was sent to {{email}} because you signed up for FIT-TRACK.
-                <br>If you didn't create this account, please ignore this email.
-            </p>
+
+        <div class="profile-card">
+          <div style="font-weight: 800; font-size: 13px; color: #ffffff; margin-bottom: 8px;">Member Credentials</div>
+          <div class="profile-row"><span style="color: #64748b;">Member:</span> <span style="color: #2dd4bf; font-weight: 700;">{{userName}}</span></div>
+          <div class="profile-row"><span style="color: #64748b;">Email:</span> <span style="color: #2dd4bf; font-weight: 700;">{{email}}</span></div>
+          <div class="profile-row"><span style="color: #64748b;">Account Created:</span> <span style="color: #38bdf8; font-weight: 700;">{{createdDate}}</span></div>
         </div>
+      </div>
+      <div style="background: #060910; padding: 24px; text-align: center; font-size: 11px; color: #475569;">
+        © {{year}} FIT TRACK AI. All rights reserved.
+      </div>
     </div>
+  </div>
 </body>
 </html>
 `;
 
-// Login notification email template
-const loginEmailTemplate = `
+// ============================================================================
+// TEMPLATE 3: LOGIN ALERT EMAIL (Comprehensive Geolocation & Security Audit)
+// ============================================================================
+const loginAlertTemplate = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Notification - Health Bloom</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f8fafc;
-        }
-        .container {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-        .header {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 24px;
-            font-weight: 700;
-        }
-        .content {
-            padding: 30px;
-        }
-        .login-info {
-            background: #f7fafc;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
-            border-left: 4px solid #48bb78;
-        }
-        .info-item {
-            display: flex;
-            justify-content: space-between;
-            margin: 10px 0;
-            padding: 5px 0;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        .info-item:last-child {
-            border-bottom: none;
-        }
-        .info-label {
-            font-weight: 600;
-            color: #2d3748;
-        }
-        .info-value {
-            color: #718096;
-        }
-        .security-notice {
-            background: #fff5f5;
-            border: 1px solid #fed7d7;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-        .security-notice h3 {
-            color: #c53030;
-            margin: 0 0 10px 0;
-        }
-        .cta-button {
-            display: inline-block;
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            color: white;
-            padding: 12px 24px;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: 600;
-            margin: 20px 0;
-        }
-        .footer {
-            background: #f7fafc;
-            padding: 20px;
-            text-align: center;
-            color: #718096;
-            font-size: 14px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Security Alert: New Sign-in to FIT TRACK AI</title>
+  <style>
+    body { margin: 0; padding: 0; background-color: #04060a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #f1f5f9; }
+    .wrapper { width: 100%; background-color: #04060a; padding: 40px 10px; }
+    .main-card { max-width: 600px; margin: 0 auto; background: #090d16; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 24px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 50px rgba(56, 189, 248, 0.2); }
+    .header-banner { background: linear-gradient(135deg, #0d1e30 0%, #081726 100%); padding: 32px 28px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+    .badge-new { display: inline-block; background: rgba(244, 63, 94, 0.2); border: 1px solid rgba(244, 63, 94, 0.4); color: #fb7185; padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 12px; }
+    .badge-trusted { display: inline-block; background: rgba(45, 212, 191, 0.2); border: 1px solid rgba(45, 212, 191, 0.4); color: #2dd4bf; padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 12px; }
+    .title { font-size: 24px; font-weight: 800; color: #ffffff; margin: 0; }
+    .content-body { padding: 32px 28px; }
+    .info-table { width: 100%; border-collapse: collapse; margin: 20px 0; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; overflow: hidden; }
+    .info-table td { padding: 12px 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 13px; }
+    .info-table tr:last-child td { border-bottom: none; }
+    .label { color: #64748b; font-weight: 600; width: 38%; }
+    .val { color: #f1f5f9; font-weight: 700; }
+    .btn-maps { display: inline-block; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.4); color: #38bdf8; font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 8px; text-decoration: none; margin-top: 4px; }
+    .cta-bar { margin-top: 28px; text-align: center; }
+    .btn-danger { display: inline-block; background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%); color: #ffffff; font-size: 13px; font-weight: 800; padding: 12px 24px; border-radius: 10px; text-decoration: none; margin-right: 8px; box-shadow: 0 0 20px rgba(244,63,94,0.3); }
+    .btn-secondary { display: inline-block; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: #ffffff; font-size: 13px; font-weight: 700; padding: 12px 20px; border-radius: 10px; text-decoration: none; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🔐 Login Notification</h1>
-            <p>Your account was accessed successfully</p>
+  <div class="wrapper">
+    <div class="main-card">
+      <div class="header-banner">
+        {{#if isNewDevice}}
+          <span class="badge-new">⚠️ NEW DEVICE DETECTED</span>
+        {{else}}
+          <span class="badge-trusted">✅ TRUSTED DEVICE SIGN-IN</span>
+        {{/if}}
+        <h1 class="title">Security Alert: Sign-in Notification</h1>
+      </div>
+
+      <div class="content-body">
+        <p style="font-size: 15px; color: #cbd5e1; line-height: 1.5; margin: 0 0 20px 0;">
+          Hi <strong>{{userName}}</strong>,<br>
+          We detected a successful sign-in to your <strong>FIT TRACK AI</strong> account (<code>{{email}}</code>).
+        </p>
+
+        <table class="info-table">
+          <tr><td class="label">Date & Time:</td><td class="val">{{currentLoginTime}} ({{timezone}})</td></tr>
+          <tr><td class="label">Previous Sign-in:</td><td class="val" style="color: #94a3b8;">{{previousLoginTime}}</td></tr>
+          <tr><td class="label">Device & OS:</td><td class="val">{{deviceString}}</td></tr>
+          <tr><td class="label">Browser:</td><td class="val">{{browser}}</td></tr>
+          <tr><td class="label">Platform:</td><td class="val" style="color: #2dd4bf;">{{platform}} ({{deviceType}})</td></tr>
+          <tr><td class="label">IP Address:</td><td class="val" style="font-family: monospace;">{{ip}}</td></tr>
+          <tr><td class="label">Approx. Location:</td><td class="val">{{locationString}}</td></tr>
+          <tr>
+            <td class="label">Map Telemetry:</td>
+            <td class="val">
+              <a href="{{mapsUrl}}" target="_blank" class="btn-maps">📍 View on Google Maps →</a>
+            </td>
+          </tr>
+        </table>
+
+        <div style="background: rgba(30, 41, 59, 0.6); border-left: 3px solid #f43f5e; padding: 14px; border-radius: 8px; font-size: 13px; color: #94a3b8; line-height: 1.5;">
+          <strong>Didn't sign in?</strong> Your account password may have been compromised. Click below immediately to lock sessions and reset your password.
         </div>
-        
-        <div class="content">
-            <p>Hi <strong>{{firstName}}</strong>,</p>
-            
-            <p>We wanted to let you know that your FIT-TRACK account was accessed successfully.</p>
-            
-            <div class="login-info">
-                <div class="info-item">
-                    <span class="info-label">Login Time:</span>
-                    <span class="info-value">{{loginTime}}</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Device:</span>
-                    <span class="info-value">{{deviceInfo}}</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Location:</span>
-                    <span class="info-value">{{location}}</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">IP Address:</span>
-                    <span class="info-value">{{ipAddress}}</span>
-                </div>
-            </div>
-            
-            <div class="security-notice">
-                <h3>🛡️ Security Notice</h3>
-                <p>If this login was not authorized by you, please:</p>
-                <ul>
-                    <li>Change your password immediately</li>
-                    <li>Contact our support team</li>
-                    <li>Review your account activity</li>
-                </ul>
-            </div>
-            
-            <div style="text-align: center;">
-                <a href="{{appUrl}}" class="cta-button">Continue to FIT-TRACK</a>
-            </div>
+
+        <div class="cta-bar">
+          <a href="{{appUrl}}/forgot-password" class="btn-danger">🔒 Secure Your Account</a>
+          <a href="{{appUrl}}/forgot-password" class="btn-secondary">Reset Password</a>
         </div>
-        
-        <div class="footer">
-            <p><strong>FIT-TRACK Security Team</strong></p>
-            <p>Keeping your account safe and secure is our top priority.</p>
-            <p style="font-size: 12px; color: #a0aec0; margin-top: 15px;">
-                This is an automated security notification. Please do not reply to this email.
-            </p>
-        </div>
+      </div>
+
+      <div style="background: #060910; padding: 24px; text-align: center; font-size: 11px; color: #475569;">
+        © {{year}} FIT TRACK AI Security Infrastructure. All rights reserved.
+      </div>
     </div>
+  </div>
 </body>
 </html>
 `;
 
-// Get real user location and IP
-const getUserLocationAndIP = async (req) => {
+// ============================================================================
+// TEMPLATE 4: PASSWORD RESET EMAIL (15-Minute Token Expiry)
+// ============================================================================
+const passwordResetTemplate = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reset Your FIT TRACK AI Password</title>
+  <style>
+    body { margin: 0; padding: 0; background-color: #04060a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #f1f5f9; }
+    .wrapper { width: 100%; background-color: #04060a; padding: 40px 10px; }
+    .main-card { max-width: 580px; margin: 0 auto; background: #090d16; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 24px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 50px rgba(244, 63, 94, 0.25); }
+    .header-banner { background: linear-gradient(135deg, #240a15 0%, #12060c 100%); padding: 36px 30px 24px 30px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+    .badge { display: inline-block; background: rgba(244, 63, 94, 0.2); border: 1px solid rgba(244, 63, 94, 0.4); color: #fb7185; padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 800; margin-bottom: 12px; }
+    .content-body { padding: 36px 32px; text-align: center; }
+    .btn-reset { display: inline-block; background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%); color: #ffffff; font-size: 15px; font-weight: 800; padding: 15px 36px; border-radius: 12px; text-decoration: none; box-shadow: 0 0 30px rgba(244, 63, 94, 0.4); margin: 24px 0; }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="main-card">
+      <div class="header-banner">
+        <span class="badge">🔑 PASSWORD RECOVERY</span>
+        <h1 style="font-size: 26px; font-weight: 800; color: #ffffff; margin: 0;">Reset Your Password</h1>
+      </div>
+
+      <div class="content-body">
+        <p style="font-size: 15px; color: #cbd5e1; line-height: 1.6; margin: 0 0 20px 0;">
+          Hi <strong>{{userName}}</strong>,<br>
+          We received a password reset request for your <strong>FIT TRACK AI</strong> account. Click the button below to set a new password:
+        </p>
+
+        <a href="{{resetUrl}}" class="btn-reset">Reset Password Now →</a>
+
+        <div style="margin-top: 20px; font-size: 13px; color: #64748b;">
+          ⏳ This single-use link expires in <strong style="color: #fb7185;">15 minutes</strong>.
+        </div>
+
+        <div style="background: rgba(30, 41, 59, 0.6); border-left: 3px solid #64748b; padding: 14px; border-radius: 8px; font-size: 12px; color: #94a3b8; text-align: left; margin-top: 28px; line-height: 1.5;">
+          <strong>Note:</strong> If you did not request a password reset, please ignore this email. Your current password will remain unchanged and secure.
+        </div>
+      </div>
+
+      <div style="background: #060910; padding: 24px; text-align: center; font-size: 11px; color: #475569;">
+        © {{year}} FIT TRACK AI. All rights reserved.
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+`;
+
+// ============================================================================
+// TEMPLATE 5: PASSWORD CHANGED NOTIFICATION EMAIL
+// ============================================================================
+const passwordChangedTemplate = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Security Notice: FIT TRACK AI Password Changed</title>
+  <style>
+    body { margin: 0; padding: 0; background-color: #04060a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #f1f5f9; }
+    .wrapper { width: 100%; background-color: #04060a; padding: 40px 10px; }
+    .main-card { max-width: 580px; margin: 0 auto; background: #090d16; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 24px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 40px rgba(45, 212, 191, 0.2); }
+    .header-banner { background: linear-gradient(135deg, #0d2720 0%, #061713 100%); padding: 32px 28px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+    .badge { display: inline-block; background: rgba(45, 212, 191, 0.2); border: 1px solid rgba(45, 212, 191, 0.4); color: #2dd4bf; padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 800; margin-bottom: 12px; }
+    .content-body { padding: 32px 28px; }
+    .table { width: 100%; border-collapse: collapse; margin: 20px 0; background: rgba(15, 23, 42, 0.8); border-radius: 12px; overflow: hidden; }
+    .table td { padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="main-card">
+      <div class="header-banner">
+        <span class="badge">🔒 SECURITY NOTICE</span>
+        <h1 style="font-size: 24px; font-weight: 800; color: #ffffff; margin: 0;">Password Successfully Changed</h1>
+      </div>
+      <div class="content-body">
+        <p style="font-size: 15px; color: #cbd5e1; line-height: 1.5;">
+          Hi <strong>{{userName}}</strong>,<br>
+          The password for your <strong>FIT TRACK AI</strong> account was recently changed.
+        </p>
+        <table class="table">
+          <tr><td style="color: #64748b;">Date & Time:</td><td style="color: #ffffff; font-weight: 700;">{{changeTime}}</td></tr>
+          <tr><td style="color: #64748b;">Device:</td><td style="color: #2dd4bf; font-weight: 700;">{{deviceString}}</td></tr>
+          <tr><td style="color: #64748b;">IP Address:</td><td style="font-family: monospace; color: #ffffff;">{{ip}}</td></tr>
+          <tr><td style="color: #64748b;">Location:</td><td style="color: #ffffff;">{{locationString}}</td></tr>
+        </table>
+        <div style="background: rgba(244, 63, 94, 0.1); border-left: 3px solid #f43f5e; padding: 14px; border-radius: 8px; font-size: 13px; color: #fb7185; margin-top: 20px;">
+          <strong>If you did not make this change:</strong> Please <a href="{{appUrl}}/forgot-password" style="color: #ffffff; text-decoration: underline;">reset your password immediately</a> to secure your account.
+        </div>
+      </div>
+      <div style="background: #060910; padding: 24px; text-align: center; font-size: 11px; color: #475569;">
+        © {{year}} FIT TRACK AI. All rights reserved.
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+`;
+
+// ============================================================================
+// EMAIL DISPATCHERS
+// ============================================================================
+
+export const sendOtpEmail = async (email, firstName, otp) => {
   try {
-    // Get IP address from request - try multiple methods
-    let ipAddress = req.ip || 
-                   req.connection?.remoteAddress || 
-                   req.socket?.remoteAddress ||
-                   req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
-                   req.headers['x-real-ip'] ||
-                   req.headers['x-client-ip'] ||
-                   req.headers['cf-connecting-ip'] ||
-                   '127.0.0.1'; // fallback to localhost
+    console.log(`📧 FIT TRACK: Dispatching OTP Email to ${email}...`);
+    const transporter = createTransporter();
+    const template = handlebars.compile(otpEmailTemplate);
 
-    // Remove IPv6 prefix if present
-    if (ipAddress.startsWith('::ffff:')) {
-      ipAddress = ipAddress.substring(7);
-    }
+    const html = template({
+      otp: otp.toString().split('').join(' '),
+      appUrl: emailConfig.APP_URL,
+      year: new Date().getFullYear(),
+    });
 
-    // If it's localhost, try to get public IP
-    if (ipAddress === '127.0.0.1' || ipAddress === '::1' || ipAddress.startsWith('192.168.') || ipAddress.startsWith('10.')) {
-      try {
-        const publicIPResponse = await fetch('https://api.ipify.org?format=json');
-        const publicIPData = await publicIPResponse.json();
-        ipAddress = publicIPData.ip || ipAddress;
-      } catch (e) {
-        console.log('Could not get public IP, using local IP');
-      }
-    }
-
-    console.log('Detected IP Address:', ipAddress);
-
-    // Get location from IP using a free service
-    const locationResponse = await fetch(`http://ip-api.com/json/${ipAddress}?fields=status,message,country,regionName,city,lat,lon,timezone,query`);
-    const locationData = await locationResponse.json();
-    
-    console.log('Location API Response:', locationData);
-    
-    let location = 'Unknown Location';
-    if (locationData.status === 'success') {
-      location = `${locationData.city || 'Unknown City'}, ${locationData.regionName || 'Unknown Region'}, ${locationData.country || 'Unknown Country'}`;
-    } else {
-      console.log('Location API Error:', locationData.message);
-    }
-
-    // Parse device information from user-agent
-    const userAgent = req.headers['user-agent'] || 'Unknown Device';
-    const deviceInfo = parseUserAgent(userAgent);
-
-    return {
-      ipAddress: ipAddress,
-      location: location,
-      device: deviceInfo
+    const mailOptions = {
+      from: getSenderHeader(),
+      to: email,
+      subject: 'Verify your FitTracker AI account',
+      html: html,
     };
+
+    const result = await transporter.sendMail(mailOptions);
+    console.log('✅ FIT TRACK: OTP Email delivered:', result.messageId);
+    return { success: true, messageId: result.messageId };
   } catch (error) {
-    console.error('Error getting location:', error);
-    const userAgent = req?.headers?.['user-agent'] || 'Unknown Device';
-    const deviceInfo = parseUserAgent(userAgent);
-    
-    return {
-      ipAddress: 'Unknown IP',
-      location: 'Unknown Location',
-      device: deviceInfo
-    };
+    console.error('❌ FIT TRACK: Error sending OTP email:', error);
+    return { success: false, error: error.message };
   }
 };
 
-// Email service functions
 export const sendWelcomeEmail = async (userData) => {
   try {
-    console.log('📧 Welcome Email - User Data:', userData);
-    
+    console.log('📧 FIT TRACK: Dispatching Welcome Email to:', userData.email);
     const transporter = createTransporter();
-    
     const template = handlebars.compile(welcomeEmailTemplate);
-    
-    let fullName = 'User';
-    
-    if (userData.firstName && userData.lastName) {
-      fullName = `${userData.firstName} ${userData.lastName}`;
-    } else if (userData.firstName) {
-      fullName = userData.firstName;
-    } else if (userData.lastName) {
-      fullName = userData.lastName;
-    }
-    
-    console.log('📧 Welcome Email - Name Logic:', {
-      firstName: userData.firstName,
-      lastName: userData.lastName,
-      fullName: fullName
+
+    const userName = userData.firstName || 'Member';
+    const createdDate = new Date(userData.createdAt || Date.now()).toLocaleDateString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
     });
-    
+
     const html = template({
-      firstName: fullName,
+      userName: userName,
       email: userData.email,
-      appUrl: emailConfig.APP_URL
+      createdDate: createdDate,
+      appUrl: emailConfig.APP_URL,
+      year: new Date().getFullYear(),
     });
 
     const mailOptions = {
-      from: `"${emailConfig.FROM_NAME}" <${emailConfig.FROM_EMAIL}>`,
+      from: getSenderHeader(),
       to: userData.email,
-      subject: '🌟 Welcome to FIT-TRACK - Your Health Journey Starts Now!',
-      html: html
+      subject: '🎉 Welcome to FIT TRACK AI',
+      html: html,
     };
 
     const result = await transporter.sendMail(mailOptions);
-    console.log('Welcome email sent successfully:', result.messageId);
+    console.log('✅ FIT TRACK: Welcome Email delivered:', result.messageId);
     return { success: true, messageId: result.messageId };
   } catch (error) {
-    console.error('Error sending welcome email:', error);
+    console.error('❌ FIT TRACK: Error sending Welcome email:', error);
     return { success: false, error: error.message };
   }
 };
 
-export const sendLoginNotification = async (userData, loginInfo) => {
+export const sendLoginAlertEmail = async ({ user, loginDetails }) => {
   try {
-    console.log('📧 Login Notification - User Data:', userData);
-    console.log('📧 Login Notification - Login Info:', loginInfo);
-    
+    console.log('📧 FIT TRACK: Dispatching Security Login Alert Email to:', user.email);
     const transporter = createTransporter();
-    
-    const template = handlebars.compile(loginEmailTemplate);
-    
-    let fullName = 'User';
-    
-    if (userData.firstName && userData.lastName) {
-      fullName = `${userData.firstName} ${userData.lastName}`;
-    } else if (userData.firstName) {
-      fullName = userData.firstName;
-    } else if (userData.lastName) {
-      fullName = userData.lastName;
-    }
-    
-    console.log('📧 Login Notification - Name Logic:', {
-      firstName: userData.firstName,
-      lastName: userData.lastName,
-      fullName: fullName
+    const template = handlebars.compile(loginAlertTemplate);
+
+    const userName = user.firstName || 'Member';
+    const now = new Date();
+
+    const formattedTime = now.toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
     });
-    
+
+    const prevLogin = user.previousLoginAt
+      ? new Date(user.previousLoginAt).toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        })
+      : 'First Sign-in on Account';
+
     const html = template({
-      firstName: fullName,
-      email: userData.email,
-      loginTime: new Date().toLocaleString('en-US', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        timeZoneName: 'short'
-      }),
-      deviceInfo: loginInfo.device || 'Unknown Device',
-      location: loginInfo.location || 'Unknown Location',
-      ipAddress: loginInfo.ipAddress || 'Unknown IP',
-      appUrl: emailConfig.APP_URL
+      userName: userName,
+      email: user.email,
+      isNewDevice: loginDetails.isNewDevice,
+      currentLoginTime: formattedTime,
+      previousLoginTime: prevLogin,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
+      deviceString: loginDetails.deviceString,
+      browser: loginDetails.browser,
+      platform: loginDetails.platform,
+      deviceType: loginDetails.isMobile ? 'Mobile' : loginDetails.isTablet ? 'Tablet' : 'Desktop',
+      ip: loginDetails.ip,
+      locationString: loginDetails.locationString,
+      mapsUrl: loginDetails.mapsUrl,
+      appUrl: emailConfig.APP_URL,
+      year: new Date().getFullYear(),
     });
 
     const mailOptions = {
-      from: `"${emailConfig.FROM_NAME} Security" <${emailConfig.FROM_EMAIL}>`,
-      to: userData.email,
-      subject: '🔐 Login Notification - FIT-TRACK Account Accessed',
-      html: html
+      from: getSenderHeader(),
+      to: user.email,
+      subject: loginDetails.isNewDevice ? '⚠️ Security Alert: New Device Sign-in to FIT TRACK AI' : 'Security Alert: Sign-in Notification - FIT TRACK AI',
+      html: html,
     };
 
     const result = await transporter.sendMail(mailOptions);
-    console.log('Login notification sent successfully:', result.messageId);
+    console.log('✅ FIT TRACK: Login Alert Email delivered:', result.messageId);
     return { success: true, messageId: result.messageId };
   } catch (error) {
-    console.error('Error sending login notification:', error);
+    console.error('❌ FIT TRACK: Error sending Login Alert email:', error);
     return { success: false, error: error.message };
   }
 };
 
-export { getUserLocationAndIP };
+export const sendPasswordResetEmail = async (email, firstName, rawToken) => {
+  try {
+    console.log(`📧 FIT TRACK: Dispatching Password Reset Email to ${email}...`);
+    const transporter = createTransporter();
+    const template = handlebars.compile(passwordResetTemplate);
+
+    const resetUrl = `${emailConfig.APP_URL}/reset-password?token=${rawToken}&email=${encodeURIComponent(email)}`;
+
+    const html = template({
+      userName: firstName || 'Member',
+      resetUrl: resetUrl,
+      appUrl: emailConfig.APP_URL,
+      year: new Date().getFullYear(),
+    });
+
+    const mailOptions = {
+      from: getSenderHeader(),
+      to: email,
+      subject: '🔑 Reset Your FIT TRACK AI Password',
+      html: html,
+    };
+
+    const result = await transporter.sendMail(mailOptions);
+    console.log('✅ FIT TRACK: Password Reset Email delivered:', result.messageId);
+    return { success: true, messageId: result.messageId };
+  } catch (error) {
+    console.error('❌ FIT TRACK: Error sending Password Reset email:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+export const sendPasswordChangedEmail = async (user, loginDetails) => {
+  try {
+    console.log(`📧 FIT TRACK: Dispatching Password Changed Notification Email to ${user.email}...`);
+    const transporter = createTransporter();
+    const template = handlebars.compile(passwordChangedTemplate);
+
+    const formattedTime = new Date().toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+    const html = template({
+      userName: user.firstName || 'Member',
+      changeTime: formattedTime,
+      deviceString: loginDetails?.deviceString || 'Web Browser',
+      ip: loginDetails?.ip || '127.0.0.1',
+      locationString: loginDetails?.locationString || 'Local Workstation',
+      appUrl: emailConfig.APP_URL,
+      year: new Date().getFullYear(),
+    });
+
+    const mailOptions = {
+      from: getSenderHeader(),
+      to: user.email,
+      subject: '🔒 Security Notice: FIT TRACK AI Password Changed',
+      html: html,
+    };
+
+    const result = await transporter.sendMail(mailOptions);
+    console.log('✅ FIT TRACK: Password Changed Email delivered:', result.messageId);
+    return { success: true, messageId: result.messageId };
+  } catch (error) {
+    console.error('❌ FIT TRACK: Error sending Password Changed email:', error);
+    return { success: false, error: error.message };
+  }
+};
 
 export default {
+  verifySmtpConnection,
+  sendOtpEmail,
   sendWelcomeEmail,
-  sendLoginNotification,
-  getUserLocationAndIP
+  sendLoginAlertEmail,
+  sendPasswordResetEmail,
+  sendPasswordChangedEmail,
 };

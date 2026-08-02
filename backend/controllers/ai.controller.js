@@ -29,7 +29,7 @@ export const chatWithGemini = async (req, res) => {
           {
             parts: [
               {
-                text: `You are a helpful health and fitness assistant for HealthBloom. Provide concise, helpful advice. Please format your responses using markdown for clarity (e.g., use **bold** for titles and * for bullet points). User message: ${message}`,
+                text: `You are a helpful health and fitness assistant for FitTracker. Provide concise, helpful advice. Please format your responses using markdown for clarity (e.g., use **bold** for titles and * for bullet points). User message: ${message}`,
               },
             ],
           },

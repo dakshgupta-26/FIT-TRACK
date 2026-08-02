@@ -104,7 +104,6 @@ export const Footer: React.FC = () => {
     { name: 'Meal Scanner', href: '/meals', badge: 'New' },
     { name: 'Health Reports', href: '/metrics' },
     { name: 'Pricing', href: '/pricing' },
-    { name: 'Roadmap', href: '/roadmap' },
     { name: 'API Docs', href: '/docs' },
     { name: 'Integrations', href: '/partners' },
     { name: 'Changelog', href: '/changelog' },
