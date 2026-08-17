@@ -1,10 +1,14 @@
-// src/hooks/useProfileImageMongo.ts (Recommended Secure Version)
-
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
+import apiClient, { getApiBaseUrl } from "@/lib/api-client";
 
-const API_BASE_URL = "http://localhost:5000/api";
+const formatImageUrl = (url: string | undefined): string => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  const host = getApiBaseUrl().replace(/\/api\/?$/, '');
+  return `${host}${url.startsWith('/') ? '' : '/'}${url}`;
+};
 
 export const useProfileImageMongo = () => {
   const [isUploading, setIsUploading] = useState(false);
@@ -14,7 +18,7 @@ export const useProfileImageMongo = () => {
 
   const loadUserProfileImage = useCallback(() => {
     if (currentUser?.profileImageUrl) {
-      setProfileImageUrl(`http://localhost:5000${currentUser.profileImageUrl}`);
+      setProfileImageUrl(formatImageUrl(currentUser.profileImageUrl));
     } else {
       setProfileImageUrl("");
     }
@@ -27,34 +31,25 @@ export const useProfileImageMongo = () => {
     try {
       const formData = new FormData();
       formData.append("image", file);
-      const token = localStorage.getItem("authToken");
 
-      // --- Use the new, more secure route ---
-      const response = await fetch(`${API_BASE_URL}/user/profile/image`, {
-        method: "POST",
+      const { data: result } = await apiClient.post('/user/profile/image', formData, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
         },
-        body: formData,
       });
 
-      if (response.ok) {
-        const result = await response.json();
-        setProfileImageUrl(`http://localhost:5000${result.imageUrl}`);
-        if (updateUserData) {
-          updateUserData(result.user);
-        }
-        toast({ title: "Success", description: "Profile image uploaded!" });
-        return result.imageUrl;
-      } else {
-        const error = await response.json();
-        throw new Error(error.error || "Upload failed");
+      const fullUrl = formatImageUrl(result.imageUrl);
+      setProfileImageUrl(fullUrl);
+      if (updateUserData) {
+        updateUserData(result.user);
       }
+      toast({ title: "Success", description: "Profile image uploaded!" });
+      return result.imageUrl;
     } catch (error: any) {
       console.error("Error uploading image:", error);
       toast({
         title: "Upload Failed",
-        description: error.message,
+        description: error.response?.data?.error || error.message || "Upload failed",
         variant: "destructive",
       });
     } finally {
@@ -64,33 +59,19 @@ export const useProfileImageMongo = () => {
 
   const deleteProfileImage = async () => {
     if (!currentUser) return;
-    const token = localStorage.getItem("authToken");
 
     try {
-      // --- Use the new, more secure route ---
-      const response = await fetch(`${API_BASE_URL}/user/profile/image`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        setProfileImageUrl("");
-        if (updateUserData) {
-          updateUserData(result.user);
-        }
-        toast({ title: "Success", description: "Profile image deleted!" });
-      } else {
-        const error = await response.json();
-        throw new Error(error.error || "Delete failed");
+      const { data: result } = await apiClient.delete('/user/profile/image');
+      setProfileImageUrl("");
+      if (updateUserData) {
+        updateUserData(result.user);
       }
+      toast({ title: "Success", description: "Profile image deleted!" });
     } catch (error: any) {
       console.error("Error deleting image:", error);
       toast({
         title: "Delete Failed",
-        description: error.message,
+        description: error.response?.data?.error || error.message || "Delete failed",
         variant: "destructive",
       });
     }

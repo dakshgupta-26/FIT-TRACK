@@ -23,4 +23,21 @@ dist-ssr
 *.sln
 *.sw?
 
+# MongoDB
+backend/data/
+*.wt
+*.lock
+*.log
+journal/
+diagnostic.data/
+
+# Environment
 .env
+.env.local
+
+# Node Modules
+node_modules/
+
+# Build
+dist/
+build/

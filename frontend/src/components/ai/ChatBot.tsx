@@ -6,6 +6,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { MessageCircle, X, Send, Bot } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { marked } from 'marked';
+import apiClient from '@/lib/api-client';
 
 interface Message {
   id: string;
@@ -53,17 +54,7 @@ export function ChatBot() {
     setInput('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/ai/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: currentInput }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to get AI response');
-      }
+      const { data } = await apiClient.post('/ai/chat', { message: currentInput });
 
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),

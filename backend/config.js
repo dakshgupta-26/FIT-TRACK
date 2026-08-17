@@ -7,7 +7,7 @@ export const config = {
   FROM_EMAIL: process.env.FROM_EMAIL || 'finplan26@gmail.com',
   
   // App Configuration
-  APP_URL: process.env.APP_URL || 'http://localhost:8080',
+  APP_URL: process.env.FRONTEND_URL || process.env.CLIENT_URL || process.env.APP_URL || 'http://localhost:5173',
   
   // MongoDB Configuration
   MONGODB_URI: process.env.MONGODB_URI || 'mongodb://localhost:27017/health-bloom',

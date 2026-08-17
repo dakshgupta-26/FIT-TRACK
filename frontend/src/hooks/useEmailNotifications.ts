@@ -1,7 +1,6 @@
 import { useCallback } from 'react';
 import { useToast } from '@/components/ui/use-toast';
-
-const API_BASE_URL = 'http://localhost:5000/api';
+import apiClient from '@/lib/api-client';
 
 export const useEmailNotifications = () => {
   const { toast } = useToast();
@@ -14,26 +13,12 @@ export const useEmailNotifications = () => {
     birthDate?: string;
   }) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/send-welcome-email`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userData }),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log('Welcome email sent:', result.messageId);
-        return { success: true, messageId: result.messageId };
-      } else {
-        const error = await response.json();
-        console.error('Failed to send welcome email:', error);
-        return { success: false, error: error.error };
-      }
+      const { data: result } = await apiClient.post('/send-welcome-email', { userData });
+      console.log('Welcome email sent:', result.messageId);
+      return { success: true, messageId: result.messageId };
     } catch (error: any) {
       console.error('Error sending welcome email:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: error.response?.data?.error || error.message };
     }
   }, []);
 
@@ -44,29 +29,12 @@ export const useEmailNotifications = () => {
     email: string;
   }) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/send-login-notification`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          userData
-          // Real location and IP will be detected by backend
-        }),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log('Login notification sent:', result.messageId);
-        return { success: true, messageId: result.messageId };
-      } else {
-        const error = await response.json();
-        console.error('Failed to send login notification:', error);
-        return { success: false, error: error.error };
-      }
+      const { data: result } = await apiClient.post('/send-login-notification', { userData });
+      console.log('Login notification sent:', result.messageId);
+      return { success: true, messageId: result.messageId };
     } catch (error: any) {
       console.error('Error sending login notification:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: error.response?.data?.error || error.message };
     }
   }, []);
 

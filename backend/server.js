@@ -28,18 +28,34 @@ if (!process.env.JWT_SECRET) {
 }
 
 // --- CORE MIDDLEWARE SETUP ---
-const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:5173,http://localhost:8080,http://localhost:3000")
-  .split(",")
-  .map((url) => url.trim());
+const getRawOrigins = () => {
+  const envOrigins = [process.env.FRONTEND_URL, process.env.CLIENT_URL, process.env.APP_URL]
+    .filter(Boolean)
+    .join(",");
+  const fallback = "http://localhost:5173,http://localhost:8080,http://localhost:3000";
+  const combined = envOrigins ? `${envOrigins},${fallback}` : fallback;
+  return Array.from(
+    new Set(
+      combined
+        .split(",")
+        .map((url) => url.trim().replace(/\/+$/, ""))
+        .filter(Boolean)
+    )
+  );
+};
+
+const allowedOrigins = getRawOrigins();
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps, curl, or Postman)
-      if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV === "development") {
+      // Allow requests with no origin (like mobile apps, curl, server-to-server)
+      if (!origin) return callback(null, true);
+      const normalizedOrigin = origin.replace(/\/+$/, "");
+      if (allowedOrigins.includes(normalizedOrigin) || process.env.NODE_ENV === "development") {
         return callback(null, true);
       }
-      return callback(null, true); // Permissive CORS for dev
+      return callback(new Error(`CORS policy violation: Origin ${origin} is not allowed.`));
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
@@ -53,12 +69,15 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static uploads
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// --- DIAGNOSTIC HEALTH CHECK ENDPOINT (Always Accessible) ---
-app.get("/api/health", (req, res) => {
+// --- DIAGNOSTIC HEALTH CHECK ENDPOINTS (Always Accessible) ---
+const healthCheckHandler = (req, res) => {
   const isDbConnected = mongoose.connection.readyState === 1;
   return res.status(isDbConnected ? 200 : 503).json({
+    status: isDbConnected ? "ok" : "degraded",
     success: isDbConnected,
-    message: isDbConnected ? "FitTracker AI API is fully operational" : "Database disconnected. Server running in degraded mode.",
+    message: isDbConnected
+      ? "FitTracker AI Backend API is fully operational"
+      : "Database disconnected. Server running in degraded mode.",
     data: {
       database: {
         status: isDbConnected ? "connected" : "disconnected",
@@ -71,7 +90,10 @@ app.get("/api/health", (req, res) => {
       timestamp: new Date().toISOString(),
     },
   });
-});
+};
+
+app.get("/health", healthCheckHandler);
+app.get("/api/health", healthCheckHandler);
 
 // --- DATABASE GUARD & API ROUTING ---
 app.use("/api", checkDbConnection);

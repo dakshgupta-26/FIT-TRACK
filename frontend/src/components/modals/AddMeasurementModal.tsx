@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { Plus, Calendar, Activity, Heart, Weight, Clock } from 'lucide-react';
+import apiClient from '@/lib/api-client';
 
 interface AddMeasurementModalProps {
   onMeasurementAdded?: () => void;
@@ -64,22 +65,14 @@ const AddMeasurementModal: React.FC<AddMeasurementModalProps> = ({ onMeasurement
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/health-metrics', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          uid: currentUser.uid,
-          type: formData.type,
-          value: parseFloat(formData.value),
-          unit: formData.unit,
-          date: formData.date,
-          notes: formData.notes
-        }),
+      const { data: result } = await apiClient.post('/health-metrics', {
+        uid: currentUser.uid,
+        type: formData.type,
+        value: parseFloat(formData.value),
+        unit: formData.unit,
+        date: formData.date,
+        notes: formData.notes
       });
-
-      const result = await response.json();
 
       if (result.success) {
         toast({

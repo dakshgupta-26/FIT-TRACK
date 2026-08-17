@@ -1,10 +1,10 @@
 // src/contexts/AuthContext.tsx
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import api, { getApiBaseUrl } from '@/services/api';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useToast } from "@/components/ui/use-toast";
-import api from '@/services/api';
 
 export interface UserData {
   _id: string;
@@ -102,8 +102,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (typeof error.response?.data?.error === 'string') {
       return error.response.data.error;
     }
-    if (error.request && !error.response) {
-      return 'Unable to reach backend server (http://localhost:5000). Ensure backend is running.';
+    if (error.isNetworkError || (error.request && !error.response)) {
+      return `Unable to reach backend server (${getApiBaseUrl()}). Ensure backend is running.`;
     }
     if (error.message) {
       return error.message;
@@ -171,9 +171,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const logout = () => {
-    try {
-      api.post('/auth/logout').catch(() => {});
-    } catch (e) {}
+    api.post('/auth/logout').catch((err) => {
+      console.warn('Logout request completed with notice:', err?.message || err);
+    });
     localStorage.removeItem('authToken');
     localStorage.removeItem('user');
     setCurrentUser(null);

@@ -1,7 +1,15 @@
 // src/lib/spotifyApi.ts
 
+const getAppBaseUrl = (): string => {
+  return (
+    import.meta.env.NEXT_PUBLIC_APP_URL ||
+    import.meta.env.VITE_APP_URL ||
+    (typeof window !== "undefined" ? window.location.origin : "http://localhost:8080")
+  );
+};
+
 const CLIENT_ID = "0123c79f0639413e887b4e5c891052ea";
-const REDIRECT_URI = "http://127.0.0.1:8080/workouts"; // <-- MUST MATCH YOUR DASHBOARD SETTING
+const REDIRECT_URI = `${getAppBaseUrl()}/workouts`;
 
 export interface SpotifyTrack {
   uri: string; // We now need the URI to play the track

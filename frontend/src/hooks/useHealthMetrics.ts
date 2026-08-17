@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import apiClient from '@/lib/api-client';
 
 export interface HealthMetric {
   _id: string;
@@ -37,8 +38,7 @@ export const useHealthMetrics = () => {
       const params = new URLSearchParams({ limit: limit.toString() });
       if (type) params.append('type', type);
       
-      const response = await fetch(`http://localhost:5000/api/health-metrics/${currentUser.uid}?${params}`);
-      const result = await response.json();
+      const { data: result } = await apiClient.get(`/health-metrics/${currentUser.uid}?${params}`);
 
       if (result.success) {
         setMetrics(result.metrics);
@@ -57,8 +57,7 @@ export const useHealthMetrics = () => {
     if (!currentUser?.uid) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/health-metrics/${currentUser.uid}/summary`);
-      const result = await response.json();
+      const { data: result } = await apiClient.get(`/health-metrics/${currentUser.uid}/summary`);
 
       if (result.success) {
         setSummary(result.summary);
@@ -73,22 +72,14 @@ export const useHealthMetrics = () => {
   const addMetric = async (type: string, value: number, unit: string, date: string, notes?: string) => {
     if (!currentUser?.uid) throw new Error('User not authenticated');
 
-    const response = await fetch('http://localhost:5000/api/health-metrics', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-        body: JSON.stringify({
-          uid: currentUser.uid,
-          type,
-          value,
-          unit,
-          date,
-          notes
-        }),
+    const { data: result } = await apiClient.post('/health-metrics', {
+      uid: currentUser.uid,
+      type,
+      value,
+      unit,
+      date,
+      notes
     });
-
-    const result = await response.json();
 
     if (result.success) {
       // Refresh metrics and summary
@@ -100,20 +91,12 @@ export const useHealthMetrics = () => {
   };
 
   const updateMetric = async (id: string, value: number, unit: string, date: string, notes?: string) => {
-    const response = await fetch(`http://localhost:5000/api/health-metrics/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        value,
-        unit,
-        date,
-        notes
-      }),
+    const { data: result } = await apiClient.put(`/health-metrics/${id}`, {
+      value,
+      unit,
+      date,
+      notes
     });
-
-    const result = await response.json();
 
     if (result.success) {
       // Refresh metrics and summary
@@ -125,11 +108,7 @@ export const useHealthMetrics = () => {
   };
 
   const deleteMetric = async (id: string) => {
-    const response = await fetch(`http://localhost:5000/api/health-metrics/${id}`, {
-      method: 'DELETE',
-    });
-
-    const result = await response.json();
+    const { data: result } = await apiClient.delete(`/health-metrics/${id}`);
 
     if (result.success) {
       // Refresh metrics and summary

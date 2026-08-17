@@ -43,8 +43,11 @@ const WorkoutRecommender = () => {
     setRecommendations([]);
 
     try {
-      // The Flask server runs on port 5000 by default
-      const response = await fetch('http://localhost:8000/recommend', {
+      const recommenderUrl =
+        import.meta.env.NEXT_PUBLIC_RECOMMENDER_URL ||
+        import.meta.env.VITE_RECOMMENDER_URL ||
+        'http://localhost:8000';
+      const response = await fetch(`${recommenderUrl}/recommend`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
