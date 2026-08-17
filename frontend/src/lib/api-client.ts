@@ -8,15 +8,19 @@ export const getApiBaseUrl = (): string => {
   const envUrl =
     (typeof import.meta !== 'undefined' && import.meta.env?.NEXT_PUBLIC_API_URL) ||
     (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) ||
-    (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_API_URL) ||
-    'http://localhost:5000/api';
+    (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_API_URL);
 
-  const cleanUrl = envUrl.trim().replace(/\/+$/, '');
-  // Ensure the base URL ends with /api if not already specified
-  if (!cleanUrl.endsWith('/api')) {
-    return `${cleanUrl}/api`;
+  if (envUrl) {
+    const cleanUrl = envUrl.trim().replace(/\/+$/, '');
+    return cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`;
   }
-  return cleanUrl;
+
+  // If in browser and not on localhost, use actual Render backend domain as default fallback
+  if (typeof window !== 'undefined' && !window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1')) {
+    return 'https://fit-track-ayrm.onrender.com/api';
+  }
+
+  return 'http://localhost:5000/api';
 };
 
 /**

@@ -36,6 +36,9 @@ diagnostic.data/
 # Environment
 .env
 .env.local
+.env.example
+.env*.example
+*.env*
 
 # Node Modules
 node_modules/

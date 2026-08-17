@@ -4,28 +4,20 @@ import { emailConfig } from './email-config.js';
 
 // Transporter with environment variable support & fallback
 const createTransporter = () => {
-  const host = process.env.SMTP_HOST;
-  const port = process.env.SMTP_PORT;
-  const user = process.env.SMTP_USER || emailConfig.SMTP_EMAIL;
-  const pass = process.env.SMTP_PASS || emailConfig.SMTP_PASSWORD;
-
-  if (host) {
-    return nodemailer.createTransport({
-      host,
-      port: Number(port) || 587,
-      secure: Number(port) === 465,
-      auth: { user, pass },
-      connectionTimeout: 10000,
-    });
-  }
+  const user = (process.env.SMTP_EMAIL || process.env.SMTP_USER || process.env.FROM_EMAIL || emailConfig.SMTP_EMAIL || '').trim();
+  const pass = (process.env.SMTP_PASSWORD || process.env.SMTP_PASS || emailConfig.SMTP_PASSWORD || '').trim();
+  const host = (process.env.SMTP_HOST || 'smtp.gmail.com').trim();
+  const port = Number(process.env.SMTP_PORT) || 587;
 
   return nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: user,
-      pass: pass,
+    host: host,
+    port: port,
+    secure: port === 465,
+    auth: { user, pass },
+    tls: {
+      rejectUnauthorized: false,
     },
-    connectionTimeout: 10000,
+    connectionTimeout: 15000,
   });
 };
 
@@ -45,8 +37,9 @@ export const verifySmtpConnection = async () => {
 };
 
 const getSenderHeader = () => {
-  const senderEmail = process.env.SMTP_USER || emailConfig.FROM_EMAIL || 'finplan26@gmail.com';
-  return `"FIT TRACK" <${senderEmail}>`;
+  const fromName = process.env.FROM_NAME || process.env.SMTP_FROM_NAME || 'FIT TRACK';
+  const senderEmail = (process.env.FROM_EMAIL || process.env.SMTP_EMAIL || process.env.SMTP_USER || emailConfig.FROM_EMAIL || 'finplan26@gmail.com').trim();
+  return `"${fromName}" <${senderEmail}>`;
 };
 
 // ============================================================================
