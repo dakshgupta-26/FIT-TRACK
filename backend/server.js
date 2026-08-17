@@ -84,7 +84,7 @@ const healthCheckHandler = (req, res) => {
         readyState: mongoose.connection.readyState,
         host: mongoose.connection.host || "N/A",
       },
-      smtp: process.env.SMTP_HOST ? "configured" : "fallback",
+      smtp: (process.env.SMTP_EMAIL || process.env.SMTP_USER || process.env.SMTP_PASSWORD || process.env.SMTP_PASS) ? "configured" : "fallback",
       uptimeSeconds: Math.floor(process.uptime()),
       environment: process.env.NODE_ENV || "development",
       timestamp: new Date().toISOString(),
