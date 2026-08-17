@@ -79,6 +79,10 @@ export const registerUser = async (req, res) => {
     const rawOtp = generateSecureOtp();
     const hashedOtp = hashOtp(rawOtp);
 
+    console.log(`\n======================================================`);
+    console.log(`🔑 [FIT TRACK OTP CODE]: ${rawOtp} (for ${normalizedEmail})`);
+    console.log(`======================================================\n`);
+
     // Hash user password for secure pending storage
     const salt = await bcrypt.genSalt(12);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -280,6 +284,10 @@ export const resendOtpUser = async (req, res) => {
     // Generate new OTP
     const rawOtp = generateSecureOtp();
     const hashedOtp = hashOtp(rawOtp);
+
+    console.log(`\n======================================================`);
+    console.log(`🔑 [FIT TRACK RESEND OTP CODE]: ${rawOtp} (for ${normalizedEmail})`);
+    console.log(`======================================================\n`);
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
     verification.hashedOtp = hashedOtp;
