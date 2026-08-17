@@ -105,9 +105,15 @@ export const registerUser = async (req, res) => {
     );
 
     // Send Email #1 (Verification OTP Email)
-    sendOtpEmail(normalizedEmail, firstName, rawOtp).catch((err) =>
-      console.warn("SMTP email dispatch warning:", err.message)
-    );
+    const emailResult = await sendOtpEmail(normalizedEmail, firstName, rawOtp);
+
+    if (!emailResult.success) {
+      console.error("❌ OTP Email Dispatch Failed:", emailResult.error);
+      return res.status(500).json({
+        success: false,
+        message: `Email delivery failed: ${emailResult.error || "SMTP Authentication Error"}. Please check server logs or SMTP credentials.`,
+      });
+    }
 
     return res.status(200).json({
       success: true,
@@ -285,9 +291,15 @@ export const resendOtpUser = async (req, res) => {
     await verification.save();
 
     // Send Email
-    sendOtpEmail(normalizedEmail, verification.firstName, rawOtp).catch((err) =>
-      console.warn("Resend OTP mail dispatch warning:", err.message)
-    );
+    const emailResult = await sendOtpEmail(normalizedEmail, verification.firstName, rawOtp);
+
+    if (!emailResult.success) {
+      console.error("❌ Resend OTP Email Dispatch Failed:", emailResult.error);
+      return res.status(500).json({
+        success: false,
+        message: `Email delivery failed: ${emailResult.error || "SMTP Authentication Error"}. Please check server logs or SMTP credentials.`,
+      });
+    }
 
     return res.status(200).json({
       success: true,

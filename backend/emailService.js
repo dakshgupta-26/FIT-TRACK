@@ -2,36 +2,69 @@ import nodemailer from 'nodemailer';
 import handlebars from 'handlebars';
 import { emailConfig } from './email-config.js';
 
-// Transporter with environment variable support & fallback
-const createTransporter = () => {
+// Transporter creator with explicit port override
+const createTransporter = (forcedPort = null) => {
   const user = (process.env.SMTP_EMAIL || process.env.SMTP_USER || process.env.FROM_EMAIL || emailConfig.SMTP_EMAIL || '').trim();
   const rawPass = (process.env.SMTP_PASSWORD || process.env.SMTP_PASS || emailConfig.SMTP_PASSWORD || '').trim();
-  // Strip all whitespace spaces from Gmail 16-character App Password
   const pass = rawPass.replace(/\s+/g, '');
 
-  const host = (process.env.SMTP_HOST || '').trim();
-  const port = Number(process.env.SMTP_PORT) || 465;
+  const host = (process.env.SMTP_HOST || 'smtp.gmail.com').trim();
+  const port = forcedPort || Number(process.env.SMTP_PORT) || 587;
+  const isSecure = port === 465;
 
-  // If custom non-gmail host is specified
   if (host && !host.includes('gmail')) {
     return nodemailer.createTransport({
       host,
       port,
-      secure: port === 465,
+      secure: isSecure,
       auth: { user, pass },
-      connectionTimeout: 15000,
+      connectionTimeout: 10000,
     });
   }
 
-  // Native Gmail transporter (handles SSL/TLS automatically on Render)
+  // Gmail SMTP transporter with explicit STARTTLS/SSL port configuration
   return nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: user,
-      pass: pass,
+    host: 'smtp.gmail.com',
+    port: port,
+    secure: isSecure,
+    requireTLS: !isSecure,
+    auth: { user, pass },
+    tls: {
+      rejectUnauthorized: false,
     },
-    connectionTimeout: 15000,
+    connectionTimeout: 8000,
+    greetingTimeout: 8000,
+    socketTimeout: 10000,
   });
+};
+
+/**
+ * Multi-Port & Transport Robust Fallback Dispatcher
+ * Attempt 1: Port 587 STARTTLS (Bypasses cloud SSL firewall blocks)
+ * Attempt 2: Port 465 Direct SSL
+ * Attempt 3: Nodemailer Built-in Gmail Service Transporter
+ */
+const sendMailWithFallback = async (mailOptions) => {
+  try {
+    const transporter587 = createTransporter(587);
+    return await transporter587.sendMail(mailOptions);
+  } catch (err587) {
+    console.warn("⚠️ Port 587 SMTP delivery notice:", err587.message, "- Trying Port 465 SSL fallback...");
+    try {
+      const result = await sendMailWithFallback(mailOptions);
+    } catch (err465) {
+      console.warn("⚠️ Port 465 SMTP delivery notice:", err465.message, "- Trying Gmail service fallback...");
+      const user = (process.env.SMTP_EMAIL || process.env.SMTP_USER || process.env.FROM_EMAIL || emailConfig.SMTP_EMAIL || '').trim();
+      const rawPass = (process.env.SMTP_PASSWORD || process.env.SMTP_PASS || emailConfig.SMTP_PASSWORD || '').trim();
+      const pass = rawPass.replace(/\s+/g, '');
+      const gmailServiceTransporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: { user, pass },
+        connectionTimeout: 10000,
+      });
+      return await gmailServiceTransporter.sendMail(mailOptions);
+    }
+  }
 };
 
 /**
@@ -39,13 +72,21 @@ const createTransporter = () => {
  */
 export const verifySmtpConnection = async () => {
   try {
-    const transporter = createTransporter();
+    const transporter = createTransporter(587);
     await transporter.verify();
-    console.log("✅ FIT TRACK Nodemailer SMTP Transporter connected & verified!");
+    console.log("✅ FIT TRACK Nodemailer SMTP Transporter connected & verified (Port 587)!");
     return true;
   } catch (error) {
-    console.warn("⚠️ FIT TRACK SMTP Transporter verification notice:", error.message);
-    return false;
+    console.warn("⚠️ FIT TRACK SMTP Transporter verification notice (Port 587):", error.message);
+    try {
+      const transporter465 = createTransporter(465);
+      await transporter465.verify();
+      console.log("✅ FIT TRACK Nodemailer SMTP Transporter connected & verified (Port 465)!");
+      return true;
+    } catch (e2) {
+      console.warn("⚠️ FIT TRACK SMTP Transporter verification notice (Port 465):", e2.message);
+      return false;
+    }
   }
 };
 
@@ -381,7 +422,6 @@ const passwordChangedTemplate = `
 export const sendOtpEmail = async (email, firstName, otp) => {
   try {
     console.log(`📧 FIT TRACK: Dispatching OTP Email to ${email}...`);
-    const transporter = createTransporter();
     const template = handlebars.compile(otpEmailTemplate);
 
     const html = template({
@@ -397,7 +437,7 @@ export const sendOtpEmail = async (email, firstName, otp) => {
       html: html,
     };
 
-    const result = await transporter.sendMail(mailOptions);
+    const result = await sendMailWithFallback(mailOptions);
     console.log('✅ FIT TRACK: OTP Email delivered:', result.messageId);
     return { success: true, messageId: result.messageId };
   } catch (error) {
@@ -409,7 +449,6 @@ export const sendOtpEmail = async (email, firstName, otp) => {
 export const sendWelcomeEmail = async (userData) => {
   try {
     console.log('📧 FIT TRACK: Dispatching Welcome Email to:', userData.email);
-    const transporter = createTransporter();
     const template = handlebars.compile(welcomeEmailTemplate);
 
     const userName = userData.firstName || 'Member';
@@ -434,7 +473,7 @@ export const sendWelcomeEmail = async (userData) => {
       html: html,
     };
 
-    const result = await transporter.sendMail(mailOptions);
+    const result = await sendMailWithFallback(mailOptions);
     console.log('✅ FIT TRACK: Welcome Email delivered:', result.messageId);
     return { success: true, messageId: result.messageId };
   } catch (error) {
@@ -446,7 +485,6 @@ export const sendWelcomeEmail = async (userData) => {
 export const sendLoginAlertEmail = async ({ user, loginDetails }) => {
   try {
     console.log('📧 FIT TRACK: Dispatching Security Login Alert Email to:', user.email);
-    const transporter = createTransporter();
     const template = handlebars.compile(loginAlertTemplate);
 
     const userName = user.firstName || 'Member';
@@ -497,7 +535,7 @@ export const sendLoginAlertEmail = async ({ user, loginDetails }) => {
       html: html,
     };
 
-    const result = await transporter.sendMail(mailOptions);
+    const result = await sendMailWithFallback(mailOptions);
     console.log('✅ FIT TRACK: Login Alert Email delivered:', result.messageId);
     return { success: true, messageId: result.messageId };
   } catch (error) {
@@ -509,7 +547,6 @@ export const sendLoginAlertEmail = async ({ user, loginDetails }) => {
 export const sendPasswordResetEmail = async (email, firstName, rawToken) => {
   try {
     console.log(`📧 FIT TRACK: Dispatching Password Reset Email to ${email}...`);
-    const transporter = createTransporter();
     const template = handlebars.compile(passwordResetTemplate);
 
     const resetUrl = `${emailConfig.APP_URL}/reset-password?token=${rawToken}&email=${encodeURIComponent(email)}`;
@@ -528,7 +565,7 @@ export const sendPasswordResetEmail = async (email, firstName, rawToken) => {
       html: html,
     };
 
-    const result = await transporter.sendMail(mailOptions);
+    const result = await sendMailWithFallback(mailOptions);
     console.log('✅ FIT TRACK: Password Reset Email delivered:', result.messageId);
     return { success: true, messageId: result.messageId };
   } catch (error) {
@@ -540,7 +577,6 @@ export const sendPasswordResetEmail = async (email, firstName, rawToken) => {
 export const sendPasswordChangedEmail = async (user, loginDetails) => {
   try {
     console.log(`📧 FIT TRACK: Dispatching Password Changed Notification Email to ${user.email}...`);
-    const transporter = createTransporter();
     const template = handlebars.compile(passwordChangedTemplate);
 
     const formattedTime = new Date().toLocaleDateString('en-US', {
@@ -568,7 +604,7 @@ export const sendPasswordChangedEmail = async (user, loginDetails) => {
       html: html,
     };
 
-    const result = await transporter.sendMail(mailOptions);
+    const result = await sendMailWithFallback(mailOptions);
     console.log('✅ FIT TRACK: Password Changed Email delivered:', result.messageId);
     return { success: true, messageId: result.messageId };
   } catch (error) {
