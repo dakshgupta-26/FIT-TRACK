@@ -93,7 +93,7 @@ export const Navbar: React.FC = () => {
             : 'py-3 bg-[#020617]/70 dark:bg-[#020617]/70 backdrop-blur-xl border border-white/15 shadow-[0_10px_35px_rgba(0,0,0,0.5)]'
         }`}
       >
-        {/* LEFT: FitTracker Logo */}
+        {/* LEFT: Fit Track Logo */}
         <Link 
           to="/" 
           onClick={(e) => {
@@ -109,7 +109,7 @@ export const Navbar: React.FC = () => {
             <Activity className="h-4 w-4 animate-pulse" />
           </div>
           <span className="text-lg font-extrabold tracking-tight text-white group-hover:text-[#2dd4bf] transition-colors duration-200">
-            FitTracker
+            Fit Track
           </span>
         </Link>
 

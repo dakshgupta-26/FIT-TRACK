@@ -80,7 +80,7 @@ export const registerUser = async (req, res) => {
     const hashedOtp = hashOtp(rawOtp);
 
     console.log(`\n======================================================`);
-    console.log(`🔑 [FIT TRACK OTP CODE]: ${rawOtp} (for ${normalizedEmail})`);
+    console.log(`🔑 [FITTRACK OTP CODE]: ${rawOtp} (for ${normalizedEmail})`);
     console.log(`======================================================\n`);
 
     // Hash user password for secure pending storage
@@ -286,7 +286,7 @@ export const resendOtpUser = async (req, res) => {
     const hashedOtp = hashOtp(rawOtp);
 
     console.log(`\n======================================================`);
-    console.log(`🔑 [FIT TRACK RESEND OTP CODE]: ${rawOtp} (for ${normalizedEmail})`);
+    console.log(`🔑 [FITTRACK RESEND OTP CODE]: ${rawOtp} (for ${normalizedEmail})`);
     console.log(`======================================================\n`);
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 

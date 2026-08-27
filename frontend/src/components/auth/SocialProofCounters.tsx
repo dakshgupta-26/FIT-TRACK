@@ -31,7 +31,7 @@ export const SocialProofCounters: React.FC = () => {
             </span>
           </div>
           <span className="text-[11px] font-medium text-slate-300 whitespace-nowrap">
-            Trusted by <strong className="text-white font-semibold">50,000+</strong> athletes
+            Trusted by <strong className="text-white font-semibold">50,000+</strong> engineers
           </span>
         </div>
 

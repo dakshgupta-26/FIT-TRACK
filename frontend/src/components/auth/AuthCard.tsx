@@ -181,7 +181,7 @@ export const AuthCard: React.FC<AuthCardProps> = ({ initialMode }) => {
           </div>
           <div className="flex flex-col">
             <span className="font-extrabold text-sm tracking-tight text-white flex items-center gap-1.5">
-              FitTracker <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-teal-500/20 text-teal-300 border border-teal-500/30">AI</span>
+              Fit Track <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-teal-500/20 text-teal-300 border border-teal-500/30">AI</span>
             </span>
           </div>
         </div>
@@ -226,8 +226,8 @@ export const AuthCard: React.FC<AuthCardProps> = ({ initialMode }) => {
           </h2>
           <p className="text-xs text-slate-400 mt-0.5">
             {mode === 'login'
-              ? 'Enter your credentials to enter your AI health portal.'
-              : 'Start your personalized AI fitness & nutrition intelligence today.'}
+              ? 'Enter your credentials to enter your AI health & fitness portal.'
+              : 'Start your personalized AI fitness intelligence on Fit Track.'}
           </p>
         </motion.div>
       </AnimatePresence>

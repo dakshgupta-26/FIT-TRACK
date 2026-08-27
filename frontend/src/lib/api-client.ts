@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
 /**
  * Dynamically resolves the API Base URL for development and production environments.
@@ -24,22 +24,25 @@ export const getApiBaseUrl = (): string => {
 };
 
 /**
- * Production-ready Axios Client for ForgeOS / FitTracker AI
+ * Production-ready Axios Client for FitTrack
  */
 export const apiClient: AxiosInstance = axios.create({
   baseURL: getApiBaseUrl(),
-  timeout: 15000,
+  timeout: 45000, // 45 seconds to accommodate cloud instance cold-starts and SMTP verification
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Request interceptor to attach JWT token
+// Request interceptor to attach JWT token and request metadata
 apiClient.interceptors.request.use(
   (config) => {
     // Ensure baseURL is dynamically updated if environment variables change
     config.baseURL = getApiBaseUrl();
+
+    // Attach correlation tracking ID and timestamp
+    (config as any).metadata = { startTime: Date.now() };
 
     const token = localStorage.getItem('authToken');
     if (token && config.headers) {
@@ -50,33 +53,41 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor for centralized error normalization
+// Response interceptor for centralized, safe error normalization & developer telemetry
 apiClient.interceptors.response.use(
-  (response: AxiosResponse) => response,
-  (error) => {
-    const currentBaseUrl = getApiBaseUrl();
+  (response: AxiosResponse) => {
+    const startTime = (response.config as any)?.metadata?.startTime;
+    const duration = startTime ? Date.now() - startTime : undefined;
+    if (process.env.NODE_ENV === 'development') {
+      console.debug(`[FitTrack API] ${response.config.method?.toUpperCase()} ${response.config.url} -> ${response.status} (${duration}ms)`);
+    }
+    return response;
+  },
+  (error: AxiosError<any>) => {
+    const startTime = (error.config as any)?.metadata?.startTime;
+    const duration = startTime ? Date.now() - startTime : undefined;
+    const method = error.config?.method?.toUpperCase() || 'HTTP';
+    const url = error.config?.url || 'endpoint';
 
+    // Structured developer telemetry (safe: never logs sensitive body payload or tokens)
     if (!error.response) {
-      // Network failure, CORS issue, or server unreachable
-      const customError = new Error(
-        `Unable to reach backend server (${currentBaseUrl}). Please verify network connectivity and backend service status.`
-      );
+      const isTimeout = error.code === 'ECONNABORTED' || error.message?.includes('timeout');
+      console.error(`[FitTrack Network Error] ${method} ${url} | Code: ${error.code || 'NO_RESPONSE'} | Latency: ${duration}ms | Reason: ${error.message}`);
+
+      let userFacingMessage = 'FitTrack is temporarily unable to connect to its services. Please try again.';
+      if (isTimeout) {
+        userFacingMessage = 'The request took longer than expected to complete. Please try again.';
+      }
+
+      const customError = new Error(userFacingMessage);
       (customError as any).isNetworkError = true;
+      (customError as any).isTimeout = isTimeout;
       (customError as any).request = error.request;
       return Promise.reject(customError);
     }
 
     const { status, data } = error.response;
-
-    if (status === 401) {
-      console.warn('🔒 401 Unauthorized: Session expired or invalid token.');
-    } else if (status === 403) {
-      console.warn('⛔ 403 Forbidden: Access denied.');
-    } else if (status === 429) {
-      console.warn('⏳ 429 Too Many Requests: Rate limit exceeded.');
-    } else if (status >= 500) {
-      console.error(`💥 ${status} Server Error (${currentBaseUrl}):`, data?.message || 'Internal Server Error');
-    }
+    console.warn(`[FitTrack API Response] ${method} ${url} -> Status: ${status} | Latency: ${duration}ms | Message: ${data?.message || data?.error || 'Error'}`);
 
     return Promise.reject(error);
   }

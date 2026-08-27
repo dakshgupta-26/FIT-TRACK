@@ -389,7 +389,7 @@ export const OtpVerificationCard: React.FC = () => {
             {status === 'redirecting' && (
               <>
                 <Sparkles className="w-4 h-4 text-teal-300 animate-spin" />
-                <span>Redirecting to FitTracker AI Dashboard...</span>
+                <span>Redirecting to Fit Track Dashboard...</span>
               </>
             )}
           </motion.div>

@@ -62,7 +62,7 @@ export const AuthContainer: React.FC<AuthContainerProps> = ({ initialMode = 'sig
             <motion.div variants={itemFadeUp}>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-300 text-[11px] font-mono backdrop-blur-md shadow-sm">
                 <Sparkles className="w-3.5 h-3.5 text-teal-400 animate-pulse" />
-                <span>Next-Gen AI Health Operating System</span>
+                <span>Next-Gen AI Fitness Platform</span>
               </div>
             </motion.div>
 
@@ -71,7 +71,7 @@ export const AuthContainer: React.FC<AuthContainerProps> = ({ initialMode = 'sig
               variants={itemFadeUp}
               className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black tracking-tight leading-[1.08] text-white"
             >
-              Health Intelligence,
+              Fit Track,
               <br />
               <span className="bg-gradient-to-r from-teal-300 via-emerald-400 to-cyan-300 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(45,212,191,0.35)]">
                 Powered by AI.
@@ -83,7 +83,7 @@ export const AuthContainer: React.FC<AuthContainerProps> = ({ initialMode = 'sig
               variants={itemFadeUp}
               className="text-xs sm:text-sm lg:text-base text-slate-300 leading-relaxed font-normal max-w-xl"
             >
-              One intelligent platform for fitness, nutrition, AI coaching, meal recognition, smartwatch telemetry, and predictive health insights.
+              One intelligent platform for workout tracking, AI nutrition scanning, continuous cardiac telemetry, and personalized performance insights.
             </motion.p>
 
             {/* Floating Realistic iPhone Product Showcase */}

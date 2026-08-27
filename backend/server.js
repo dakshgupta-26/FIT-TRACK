@@ -32,7 +32,7 @@ const getRawOrigins = () => {
   const envOrigins = [process.env.FRONTEND_URL, process.env.CLIENT_URL, process.env.APP_URL]
     .filter(Boolean)
     .join(",");
-  const fallback = "http://localhost:5173,http://localhost:8080,http://localhost:3000";
+  const fallback = "https://fit-track-neon-xi.vercel.app,http://localhost:5173,http://localhost:8080,http://localhost:3000";
   const combined = envOrigins ? `${envOrigins},${fallback}` : fallback;
   return Array.from(
     new Set(
@@ -76,15 +76,13 @@ const healthCheckHandler = (req, res) => {
     status: isDbConnected ? "ok" : "degraded",
     success: isDbConnected,
     message: isDbConnected
-      ? "FitTracker AI Backend API is fully operational"
+      ? "Fit Track Backend API is fully operational"
       : "Database disconnected. Server running in degraded mode.",
     data: {
       database: {
         status: isDbConnected ? "connected" : "disconnected",
         readyState: mongoose.connection.readyState,
-        host: mongoose.connection.host || "N/A",
       },
-      smtp: (process.env.SMTP_EMAIL || process.env.SMTP_USER || process.env.SMTP_PASSWORD || process.env.SMTP_PASS) ? "configured" : "fallback",
       uptimeSeconds: Math.floor(process.uptime()),
       environment: process.env.NODE_ENV || "development",
       timestamp: new Date().toISOString(),
@@ -105,7 +103,7 @@ app.use(errorHandler);
 // --- STRICT STARTUP SEQUENCE ---
 const startServer = async () => {
   console.log("=======================================================");
-  console.log("🚀 Initializing FitTracker AI Backend Server...");
+  console.log("🚀 Initializing Fit Track Backend Server...");
   console.log("=======================================================");
 
   // 1. Connect Database (Awaited BEFORE app.listen)
@@ -126,7 +124,7 @@ const startServer = async () => {
   // 4. Start Accepting HTTP Requests
   app.listen(PORT, () => {
     console.log(`\n=======================================================`);
-    console.log(`🟢 FitTracker AI Server listening on: http://localhost:${PORT}`);
+    console.log(`🟢 Fit Track Server listening on: http://localhost:${PORT}`);
     console.log(`📊 Health Endpoint: http://localhost:${PORT}/api/health`);
     console.log(`🔒 Database Status: ${isConnected ? "Connected (100% Ready)" : "DISCONNECTED (Requires MongoDB Start)"}`);
     console.log(`=======================================================\n`);

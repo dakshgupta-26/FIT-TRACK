@@ -88,27 +88,47 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setCurrentUser(data.user);
     toast({
       title: "🎉 Access Granted!",
-      description: `Welcome to FitTracker AI, ${data.user.firstName}!`,
+      description: `Welcome to Fit Track, ${data.user.firstName}!`,
     });
   };
 
   const extractErrorMessage = (error: any): string => {
-    if (error.response?.data?.message) {
+    // 1. If backend returned a structured JSON message
+    if (error.response?.data?.message && typeof error.response.data.message === 'string') {
       return error.response.data.message;
     }
-    if (error.response?.data?.error?.message) {
+    if (error.response?.data?.error?.message && typeof error.response.data.error.message === 'string') {
       return error.response.data.error.message;
     }
     if (typeof error.response?.data?.error === 'string') {
       return error.response.data.error;
     }
-    if (error.isNetworkError || (error.request && !error.response)) {
-      return `Unable to reach backend server (${getApiBaseUrl()}). Ensure backend is running.`;
+
+    // 2. HTTP Status Code specific handling
+    if (error.response?.status) {
+      const status = error.response.status;
+      if (status === 400) return 'Invalid request data. Please check your inputs and try again.';
+      if (status === 401) return 'Invalid credentials or expired session. Please sign in again.';
+      if (status === 403) return 'Access denied. You do not have permission to perform this action.';
+      if (status === 404) return 'The requested authentication service was not found.';
+      if (status === 409) return 'An account with this email address already exists. Please log in.';
+      if (status === 422) return 'Validation error. Please verify the entered information.';
+      if (status === 429) return 'Too many attempts. Please wait a few minutes before trying again.';
+      if (status >= 500) return 'FitTrack server encountered an issue. Please try again shortly.';
     }
-    if (error.message) {
+
+    // 3. Network or Timeout errors (Safe production message without URL exposure)
+    if (error.isTimeout) {
+      return 'The request took longer than expected. Please check your connection and try again.';
+    }
+    if (error.isNetworkError || (error.request && !error.response)) {
+      return 'FitTrack is temporarily unable to connect to its services. Please try again.';
+    }
+    if (error.message && !error.message.includes('http://') && !error.message.includes('https://')) {
       return error.message;
     }
-    return 'An unexpected error occurred during authentication.';
+
+    return 'We couldn\'t complete your request. Please try again in a moment.';
   };
 
   const handleAuthError = (error: any, action: string) => {

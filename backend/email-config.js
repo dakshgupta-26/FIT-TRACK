@@ -3,11 +3,11 @@ export const emailConfig = {
   // Gmail SMTP Configuration
   SMTP_EMAIL: process.env.SMTP_USER || process.env.SMTP_EMAIL || 'finplan26@gmail.com',
   SMTP_PASSWORD: process.env.SMTP_PASS || process.env.SMTP_PASSWORD || 'scyz pzat uaby zlxa',
-  FROM_NAME: process.env.SMTP_FROM_NAME || process.env.FROM_NAME || 'FIT-TRACK',
+  FROM_NAME: process.env.SMTP_FROM_NAME || process.env.FROM_NAME || 'FitTrack',
   FROM_EMAIL: process.env.EMAIL_FROM || process.env.FROM_EMAIL || 'finplan26@gmail.com',
-  
+
   // App Configuration
-  APP_URL: process.env.FRONTEND_URL || process.env.CLIENT_URL || process.env.APP_URL || 'http://localhost:5173'
+  APP_URL: process.env.FRONTEND_URL || process.env.CLIENT_URL || process.env.APP_URL || 'https://fit-track-neon-xi.vercel.app'
 };
 
 // Instructions:

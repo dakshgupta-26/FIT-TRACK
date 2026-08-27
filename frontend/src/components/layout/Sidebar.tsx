@@ -136,7 +136,7 @@ export function Sidebar() {
 
               <div className="flex flex-col">
                 <div className="font-black text-sm tracking-tight text-white flex items-center gap-1.5">
-                  FitTracker <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/40">OS v3.5</span>
+                  FitTracker
                 </div>
                 <div className="text-[9px] font-mono text-emerald-400 flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
