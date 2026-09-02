@@ -11,7 +11,7 @@ import { configureCloudinary } from "./config/cloudinary.js";
 import apiRoutes from "./routes/index.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { checkDbConnection } from "./middleware/checkDbConnection.js";
-import { verifySmtpConnection } from "./emailService.js";
+import { verifyMailjetConfig } from "./services/email/email.service.js";
 
 // --- INITIAL ENVIRONMENT SETUP ---
 dotenv.config();
@@ -116,9 +116,9 @@ const startServer = async () => {
     console.warn("Cloudinary configuration warning:", e.message);
   }
 
-  // 3. Verify SMTP Connection asynchronously
-  verifySmtpConnection().catch((err) =>
-    console.warn("SMTP verification check failed:", err.message)
+  // 3. Verify Mailjet Email Service Configuration
+  verifyMailjetConfig().catch((err) =>
+    console.warn("Email service verification notice:", err.message)
   );
 
   // 4. Start Accepting HTTP Requests

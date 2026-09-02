@@ -9,12 +9,13 @@ import { isDisposableEmail } from "../utils/disposableEmail.js";
 import { parseUserAgent } from "../utils/deviceParser.js";
 import { getIpGeolocation } from "../utils/geoIp.js";
 import {
+  sendVerificationOtpEmail,
   sendOtpEmail,
   sendWelcomeEmail,
   sendLoginAlertEmail,
   sendPasswordResetEmail,
   sendPasswordChangedEmail,
-} from "../emailService.js";
+} from "../services/email/email.service.js";
 
 // Helper to generate a JWT
 const generateToken = (id) => {
@@ -115,7 +116,7 @@ export const registerUser = async (req, res) => {
       console.error("❌ OTP Email Dispatch Failed:", emailResult.error);
       return res.status(500).json({
         success: false,
-        message: `Email delivery failed: ${emailResult.error || "SMTP Authentication Error"}. Please check server logs or SMTP credentials.`,
+        message: "We couldn't send the email right now. Please try again.",
       });
     }
 
@@ -305,7 +306,7 @@ export const resendOtpUser = async (req, res) => {
       console.error("❌ Resend OTP Email Dispatch Failed:", emailResult.error);
       return res.status(500).json({
         success: false,
-        message: `Email delivery failed: ${emailResult.error || "SMTP Authentication Error"}. Please check server logs or SMTP credentials.`,
+        message: "We couldn't send the email right now. Please try again.",
       });
     }
 

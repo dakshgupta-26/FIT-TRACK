@@ -9,8 +9,6 @@ import aiRoutes from "./ai.routes.js";
 import mealRoutes from "./meal.routes.js";
 import workoutRoutes from "./workout.routes.js";
 import communityRoutes from "./community.routes.js";
-// import emailRoutes from "./email.routes.js";
-
 const router = express.Router();
 
 // Health Check Route
@@ -28,6 +26,5 @@ router.use("/ai", aiRoutes);
 router.use("/meals", mealRoutes);
 router.use("/workouts", workoutRoutes);
 router.use("/community", communityRoutes);
-// router.use("/email", emailRoutes);
 
 export default router;
