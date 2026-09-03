@@ -43,20 +43,20 @@ export const AuthContainer: React.FC<AuthContainerProps> = ({ initialMode = 'sig
   };
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden bg-[#04060a] text-white flex items-center justify-center p-4 sm:p-6 lg:p-8 font-sans select-none">
+    <div className="relative min-h-screen min-h-[100dvh] w-full overflow-y-auto bg-[#04060a] text-white flex items-center justify-center p-3 sm:p-6 lg:p-8 font-sans">
       {/* Background Animated Mesh, Aurora, Particles & Noise */}
       <BackgroundAurora />
 
-      {/* Main Viewport Container (Zero Scrollable 100vh Centered Workspace) */}
-      <div className="relative z-10 w-full max-w-[1400px] h-full flex items-center justify-center">
+      {/* Main Viewport Container */}
+      <div className="relative z-10 w-full max-w-[1400px] min-h-full flex items-center justify-center py-6 lg:py-0">
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="w-full h-full flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-8 xl:gap-12"
+          className="w-full flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-8 xl:gap-12"
         >
           {/* ================= LEFT SIDE: Product Showcase (58% width on desktop) ================= */}
-          <div className="w-full lg:w-[58%] flex flex-col justify-center items-center lg:items-start text-center lg:text-left space-y-3 xl:space-y-4 max-h-full">
+          <div className="w-full lg:w-[58%] flex flex-col justify-center items-center lg:items-start text-center lg:text-left space-y-3 xl:space-y-4">
             
             {/* Feature Badge */}
             <motion.div variants={itemFadeUp}>
@@ -69,7 +69,7 @@ export const AuthContainer: React.FC<AuthContainerProps> = ({ initialMode = 'sig
             {/* Very Large Headline */}
             <motion.h1
               variants={itemFadeUp}
-              className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black tracking-tight leading-[1.08] text-white"
+              className="text-2xl sm:text-4xl lg:text-5xl xl:text-6xl font-black tracking-tight leading-[1.1] text-white"
             >
               Fit Track,
               <br />
@@ -86,18 +86,18 @@ export const AuthContainer: React.FC<AuthContainerProps> = ({ initialMode = 'sig
               One intelligent platform for workout tracking, AI nutrition scanning, continuous cardiac telemetry, and personalized performance insights.
             </motion.p>
 
-            {/* Floating Realistic iPhone Product Showcase */}
+            {/* Floating Realistic iPhone Product Showcase (Visible on Desktop / Large Tablet) */}
             <motion.div
               variants={itemFadeUp}
-              className="w-full flex justify-center lg:justify-start pt-1"
+              className="hidden lg:flex w-full justify-center lg:justify-start pt-1"
             >
               <PhoneShowcase />
             </motion.div>
           </div>
 
           {/* ================= RIGHT SIDE: Authentication Card or OTP Verification Card ================= */}
-          <div className="w-full lg:w-[42%] flex justify-center lg:justify-end items-center max-h-full">
-            <motion.div variants={cardVariants} className="w-full flex justify-center lg:justify-end">
+          <div className="w-full lg:w-[42%] flex justify-center lg:justify-end items-center">
+            <motion.div variants={cardVariants} className="w-full flex justify-center lg:justify-end max-w-md lg:max-w-none">
               {children || <AuthCard initialMode={initialMode} />}
             </motion.div>
           </div>

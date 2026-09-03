@@ -24,9 +24,7 @@ import {
   Users,
   ShieldCheck,
   LogOut,
-  Sliders,
-  CheckCircle2,
-  Zap,
+  X,
 } from 'lucide-react';
 
 interface NavGroup {
@@ -74,7 +72,12 @@ const navGroups: NavGroup[] = [
   },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  mobileOpen?: boolean;
+  onCloseMobile?: () => void;
+}
+
+export function Sidebar({ mobileOpen = false, onCloseMobile }: SidebarProps) {
   const [expanded, setExpanded] = useState(true);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [activeTelemetryIndex, setActiveTelemetryIndex] = useState(0);
@@ -97,6 +100,13 @@ export function Sidebar() {
     return () => clearInterval(interval);
   }, []);
 
+  // Auto-close mobile drawer on route change
+  useEffect(() => {
+    if (onCloseMobile) {
+      onCloseMobile();
+    }
+  }, [location.pathname]);
+
   const currentTelemetry = telemetryData[activeTelemetryIndex];
   const TelemetryIcon = currentTelemetry.icon;
 
@@ -106,21 +116,19 @@ export function Sidebar() {
     navigate('/login');
   };
 
-  return (
-    <>
-      <aside
-        className={cn(
-          'relative bg-slate-950/90 text-slate-100 border-r border-white/10 backdrop-blur-3xl h-screen transition-all duration-300 sticky top-0 flex flex-col z-30 select-none shadow-[10px_0_40px_rgba(0,0,0,0.8)] font-sans',
-          expanded ? 'w-68' : 'w-20'
-        )}
-      >
-        {/* Subtle Ambient Aurora Glow */}
-        <div className="absolute top-0 left-0 w-full h-40 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+  const renderNavContent = (isMobileView: boolean = false) => {
+    const isExpanded = isMobileView || expanded;
 
+    return (
+      <div className="flex flex-col h-full select-none">
         {/* Header Logo Bar */}
         <div className="flex items-center justify-between p-4 border-b border-white/10 h-16 shrink-0 relative z-10">
-          {expanded ? (
-            <NavLink to="/dashboard" className="flex items-center gap-2.5 group">
+          {isExpanded ? (
+            <NavLink
+              to="/dashboard"
+              onClick={() => isMobileView && onCloseMobile?.()}
+              className="flex items-center gap-2.5 group"
+            >
               <div className="relative">
                 <motion.div
                   animate={{ scale: [1, 1.25, 1], opacity: [0.4, 0.8, 0.4] }}
@@ -154,19 +162,33 @@ export function Sidebar() {
             </div>
           )}
 
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="p-1.5 rounded-xl bg-slate-900 border border-white/10 hover:border-teal-500/40 text-slate-400 hover:text-white transition shrink-0"
-          >
-            {expanded ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-          </button>
+          {isMobileView ? (
+            <button
+              onClick={onCloseMobile}
+              className="p-2 rounded-xl bg-slate-900 border border-white/10 hover:border-teal-500/40 text-slate-400 hover:text-white transition shrink-0"
+              aria-label="Close Navigation Drawer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          ) : (
+            <button
+              onClick={() => setExpanded(!expanded)}
+              className="p-1.5 rounded-xl bg-slate-900 border border-white/10 hover:border-teal-500/40 text-slate-400 hover:text-white transition shrink-0"
+              aria-label={expanded ? "Collapse Sidebar" : "Expand Sidebar"}
+            >
+              {expanded ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+            </button>
+          )}
         </div>
 
         {/* Raycast Spotlight Search Trigger Bar */}
-        {expanded && (
+        {isExpanded && (
           <div className="p-3 border-b border-white/5 relative z-10">
             <button
-              onClick={() => setIsSearchOpen(true)}
+              onClick={() => {
+                setIsSearchOpen(true);
+                if (isMobileView) onCloseMobile?.();
+              }}
               className="w-full px-3 py-2 rounded-2xl bg-slate-900/80 hover:bg-teal-950/40 border border-white/10 hover:border-teal-500/40 text-xs text-slate-400 hover:text-teal-300 flex items-center justify-between transition group backdrop-blur-md"
             >
               <div className="flex items-center gap-2">
@@ -185,7 +207,7 @@ export function Sidebar() {
         <div className="flex-1 py-3 overflow-y-auto custom-scrollbar px-3 space-y-5 relative z-10">
           {navGroups.map((group, idx) => (
             <div key={idx} className="space-y-1">
-              {expanded && (
+              {isExpanded && (
                 <div className="px-3 text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider mb-1">
                   {group.groupName}
                 </div>
@@ -199,20 +221,21 @@ export function Sidebar() {
                   <NavLink
                     key={item.href}
                     to={item.href}
+                    onClick={() => isMobileView && onCloseMobile?.()}
                     className={({ isActive }) =>
                       cn(
                         'relative flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-xs font-bold transition-all duration-300 group',
                         isActive
                           ? 'text-teal-300'
                           : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent',
-                        !expanded && 'justify-center px-0'
+                        !isExpanded && 'justify-center px-0'
                       )
                     }
                   >
                     {/* Active Glass Highlight Background */}
                     {isActive && (
                       <motion.div
-                        layoutId="sidebarActivePill"
+                        layoutId={isMobileView ? "mobileSidebarActivePill" : "sidebarActivePill"}
                         className="absolute inset-0 rounded-2xl bg-gradient-to-r from-teal-500/20 via-cyan-500/10 to-emerald-500/5 border border-teal-400/40 shadow-[0_0_20px_rgba(45,212,191,0.2)] z-0"
                         transition={{ type: 'spring', stiffness: 350, damping: 30 }}
                       />
@@ -221,7 +244,7 @@ export function Sidebar() {
                     {/* Left Neon Pulse Beam Indicator */}
                     {isActive && (
                       <motion.div
-                        layoutId="sidebarActiveBeam"
+                        layoutId={isMobileView ? "mobileSidebarActiveBeam" : "sidebarActiveBeam"}
                         className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-teal-400 rounded-r-full shadow-[0_0_12px_#2dd4bf] z-10"
                         transition={{ type: 'spring', stiffness: 350, damping: 30 }}
                       />
@@ -232,19 +255,19 @@ export function Sidebar() {
                         className={cn(
                           'shrink-0 transition-transform duration-300 group-hover:scale-110',
                           isActive ? 'text-teal-400 drop-shadow-[0_0_8px_rgba(45,212,191,0.8)]' : 'text-slate-400 group-hover:text-white',
-                          expanded ? 'w-4 h-4' : 'w-5 h-5'
+                          isExpanded ? 'w-4 h-4' : 'w-5 h-5'
                         )}
                       />
 
-                      {expanded && <span className="truncate flex-1">{item.label}</span>}
+                      {isExpanded && <span className="truncate flex-1">{item.label}</span>}
 
-                      {expanded && item.badge && (
+                      {isExpanded && item.badge && (
                         <span className="text-[9px] font-mono font-extrabold px-2 py-0.5 rounded-full bg-teal-400/20 text-teal-300 border border-teal-400/30">
                           {item.badge}
                         </span>
                       )}
 
-                      {expanded && item.isHot && (
+                      {isExpanded && item.isHot && (
                         <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
                       )}
                     </div>
@@ -256,7 +279,7 @@ export function Sidebar() {
         </div>
 
         {/* Live AI Telemetry Widget (Sidebar Bottom Center) */}
-        {expanded && (
+        {isExpanded && (
           <div className="mx-3 mb-3 p-3 rounded-2xl bg-slate-900/80 border border-teal-500/30 backdrop-blur-xl relative z-10 shadow-lg">
             <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 mb-1">
               <span>LIVE TELEMETRY</span>
@@ -291,7 +314,7 @@ export function Sidebar() {
               onClick={() => setShowProfileMenu(!showProfileMenu)}
               className={cn(
                 'w-full flex items-center gap-3 rounded-2xl p-2 bg-slate-900/60 hover:bg-slate-900 border border-white/10 hover:border-teal-500/40 transition text-left group',
-                !expanded && 'justify-center p-0 bg-transparent border-0'
+                !isExpanded && 'justify-center p-0 bg-transparent border-0'
               )}
             >
               <div className="relative shrink-0">
@@ -303,7 +326,7 @@ export function Sidebar() {
                 <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-slate-950" />
               </div>
 
-              {expanded && (
+              {isExpanded && (
                 <div className="min-w-0 flex-1">
                   <div className="text-xs font-black text-white truncate group-hover:text-teal-300">
                     Daksh Gupta
@@ -329,6 +352,7 @@ export function Sidebar() {
                     onClick={() => {
                       navigate('/profile');
                       setShowProfileMenu(false);
+                      if (isMobileView) onCloseMobile?.();
                     }}
                     className="w-full text-left px-3 py-2 rounded-xl text-xs text-slate-200 hover:bg-white/5 flex items-center gap-2"
                   >
@@ -340,6 +364,7 @@ export function Sidebar() {
                     onClick={() => {
                       navigate('/settings');
                       setShowProfileMenu(false);
+                      if (isMobileView) onCloseMobile?.();
                     }}
                     className="w-full text-left px-3 py-2 rounded-xl text-xs text-slate-200 hover:bg-white/5 flex items-center gap-2"
                   >
@@ -359,7 +384,52 @@ export function Sidebar() {
             </AnimatePresence>
           </div>
         </div>
+      </div>
+    );
+  };
+
+  return (
+    <>
+      {/* 1. DESKTOP SIDEBAR (Visible >= 1024px) */}
+      <aside
+        className={cn(
+          'hidden lg:flex relative bg-slate-950/90 text-slate-100 border-r border-white/10 backdrop-blur-3xl h-screen sticky top-0 flex-col z-30 select-none shadow-[10px_0_40px_rgba(0,0,0,0.8)] font-sans transition-all duration-300',
+          expanded ? 'w-68' : 'w-20'
+        )}
+      >
+        {/* Subtle Ambient Aurora Glow */}
+        <div className="absolute top-0 left-0 w-full h-40 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+        {renderNavContent(false)}
       </aside>
+
+      {/* 2. MOBILE / TABLET SLIDE-OVER DRAWER (Visible < 1024px) */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <div className="lg:hidden fixed inset-0 z-50 flex">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={onCloseMobile}
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40"
+            />
+
+            {/* Slide-over Drawer */}
+            <motion.aside
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+              className="relative w-72 max-w-[85vw] h-full bg-slate-950 text-slate-100 border-r border-white/10 shadow-2xl z-50 flex flex-col font-sans"
+            >
+              <div className="absolute top-0 left-0 w-full h-40 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+              {renderNavContent(true)}
+            </motion.aside>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Spotlight Command Modal */}
       <AiCommandSearchModal

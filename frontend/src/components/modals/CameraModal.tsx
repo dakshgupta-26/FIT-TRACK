@@ -9,9 +9,9 @@ const Modal = ({ isOpen, onClose, children }: { isOpen: boolean, onClose: () => 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
-      <div className="bg-gray-800 p-4 rounded-lg shadow-xl w-full max-w-lg relative text-white">
-        <button onClick={onClose} className="absolute top-2 right-3 text-2xl font-bold text-white hover:text-gray-300">&times;</button>
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex justify-center items-center z-50 p-3 sm:p-4">
+      <div className="bg-gray-900 border border-white/10 p-4 sm:p-6 rounded-2xl shadow-2xl w-full max-w-lg relative text-white max-h-[90vh] overflow-y-auto">
+        <button onClick={onClose} className="absolute top-3 right-3 text-xl font-bold text-white/70 hover:text-white">&times;</button>
         {children}
       </div>
     </div>

@@ -333,7 +333,7 @@ export const Settings: React.FC = () => {
         {/* MAIN BENTO DASHBOARD WORKSPACE WITH SIDEBAR */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* LEFT SCROLLABLE CATEGORY SIDEBAR */}
-          <div className="lg:col-span-3 sticky top-20 rounded-3xl bg-slate-900/80 border border-white/10 backdrop-blur-2xl p-3 shadow-xl space-y-1">
+          <div className="lg:col-span-3 lg:sticky lg:top-20 rounded-2xl sm:rounded-3xl bg-slate-900/80 border border-white/10 backdrop-blur-2xl p-2 sm:p-3 shadow-xl flex lg:flex-col overflow-x-auto gap-2 lg:gap-1 no-scrollbar">
             {[
               { id: 'general', label: 'General System', icon: Sliders },
               { id: 'account', label: 'Account Specs', icon: User },
@@ -348,7 +348,7 @@ export const Settings: React.FC = () => {
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id as any)}
-                className={`relative w-full px-4 py-3 rounded-2xl text-xs font-bold transition flex items-center justify-between ${
+                className={`relative shrink-0 lg:w-full px-3.5 sm:px-4 py-2 sm:py-3 rounded-2xl text-xs font-bold transition flex items-center justify-between gap-2.5 ${
                   activeCategory === cat.id
                     ? 'text-slate-950 font-extrabold'
                     : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
@@ -361,11 +361,11 @@ export const Settings: React.FC = () => {
                     transition={{ type: 'spring', stiffness: 350, damping: 25 }}
                   />
                 )}
-                <div className="flex items-center gap-3 z-10">
-                  <cat.icon className={`w-4 h-4 ${activeCategory === cat.id ? 'text-slate-950' : 'text-slate-400'}`} />
-                  <span>{cat.label}</span>
+                <div className="flex items-center gap-2.5 sm:gap-3 z-10">
+                  <cat.icon className={`w-4 h-4 shrink-0 ${activeCategory === cat.id ? 'text-slate-950' : 'text-slate-400'}`} />
+                  <span className="whitespace-nowrap lg:whitespace-normal">{cat.label}</span>
                 </div>
-                <ChevronRight className={`w-3.5 h-3.5 z-10 ${activeCategory === cat.id ? 'text-slate-950' : 'text-slate-600'}`} />
+                <ChevronRight className={`hidden lg:block w-3.5 h-3.5 z-10 ${activeCategory === cat.id ? 'text-slate-950' : 'text-slate-600'}`} />
               </button>
             ))}
           </div>

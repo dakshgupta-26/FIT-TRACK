@@ -167,7 +167,7 @@ export const KeynoteHeroSection: React.FC = () => {
 
             {/* Word-by-Word Animated Keynote Headline */}
             <div className="space-y-2">
-              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.08] flex flex-wrap gap-x-3 gap-y-1">
+              <h1 className="text-3xl sm:text-5xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.1] flex flex-wrap gap-x-2 sm:gap-x-3 gap-y-1">
                 {headlineWords.map((word, idx) => (
                   <motion.span
                     key={idx}
@@ -187,7 +187,7 @@ export const KeynoteHeroSection: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.6 }}
-              className="text-base sm:text-lg text-white/70 leading-relaxed font-normal max-w-xl"
+              className="text-sm sm:text-base lg:text-lg text-white/70 leading-relaxed font-normal max-w-xl"
             >
               Continuous biometric telemetry, instant AI food camera recognition, adaptive workout planning, and 24/7 cardiac health coaching—unified in one enterprise platform.
             </motion.p>
@@ -197,15 +197,15 @@ export const KeynoteHeroSection: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.7 }}
-              className="flex flex-wrap items-center gap-4 pt-2"
+              className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3 sm:gap-4 pt-2"
             >
               {/* Primary magnetic CTA */}
               <Button
                 asChild
                 size="lg"
-                className="h-13 px-7 bg-gradient-to-r from-[#14b8a6] to-[#0d9488] hover:from-[#0d9488] hover:to-[#0f766e] text-white font-bold rounded-2xl shadow-[0_0_35px_rgba(20,184,166,0.4)] transition-all hover:scale-105 group"
+                className="h-12 sm:h-13 px-7 bg-gradient-to-r from-[#14b8a6] to-[#0d9488] hover:from-[#0d9488] hover:to-[#0f766e] text-white font-bold rounded-2xl shadow-[0_0_35px_rgba(20,184,166,0.4)] transition-all hover:scale-105 group"
               >
-                <Link to="/signup" className="flex items-center gap-2">
+                <Link to="/signup" className="flex items-center justify-center gap-2">
                   <span>Start Free Trial</span>
                   <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
@@ -269,47 +269,47 @@ export const KeynoteHeroSection: React.FC = () => {
           </div>
 
           {/* RIGHT SIDE: Massive Multi-Device Interactive Hardware Matrix */}
-          <div className="lg:col-span-6 relative flex justify-center items-center min-h-[520px] lg:min-h-[600px]">
+          <div className="lg:col-span-6 relative flex justify-center items-center min-h-[380px] sm:min-h-[520px] lg:min-h-[600px] overflow-hidden lg:overflow-visible">
             
             {/* 1. CENTER STAGE: FLOATING MACBOOK PRO DARK GLASS DASHBOARD */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 30 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="w-full max-w-xl rounded-3xl bg-[#07111f] border border-white/15 shadow-[0_30px_90px_rgba(0,0,0,0.85)] overflow-hidden relative z-10"
+              className="w-full max-w-xl rounded-2xl sm:rounded-3xl bg-[#07111f] border border-white/15 shadow-[0_30px_90px_rgba(0,0,0,0.85)] overflow-hidden relative z-10"
             >
               {/* Safari Window Header Bar */}
-              <div className="h-9 px-4 bg-white/[0.03] border-b border-white/[0.08] flex items-center justify-between">
+              <div className="h-9 px-3 sm:px-4 bg-white/[0.03] border-b border-white/[0.08] flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
-                  <div className="h-3 w-3 rounded-full bg-red-500/80" />
-                  <div className="h-3 w-3 rounded-full bg-yellow-500/80" />
-                  <div className="h-3 w-3 rounded-full bg-green-500/80" />
+                  <div className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-red-500/80" />
+                  <div className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-yellow-500/80" />
+                  <div className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-green-500/80" />
                 </div>
-                <div className="px-4 py-0.5 rounded-md bg-white/[0.04] text-[10px] font-mono text-white/50 border border-white/[0.05] flex items-center gap-2">
-                  <Lock className="h-3 w-3 text-[#14b8a6]" />
-                  <span>app.fittracker.ai/dashboard</span>
+                <div className="px-2 sm:px-4 py-0.5 rounded-md bg-white/[0.04] text-[9px] sm:text-[10px] font-mono text-white/50 border border-white/[0.05] flex items-center gap-1.5 sm:gap-2 truncate max-w-[180px] sm:max-w-none">
+                  <Lock className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-[#14b8a6] shrink-0" />
+                  <span className="truncate">app.fittracker.ai/dashboard</span>
                 </div>
-                <Wifi className="h-3.5 w-3.5 text-white/40" />
+                <Wifi className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-white/40 shrink-0" />
               </div>
 
               {/* MacBook Screen Body */}
-              <div className="p-6 space-y-4">
+              <div className="p-3.5 sm:p-6 space-y-3 sm:space-y-4">
                 {/* Top Metrics Row */}
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="p-3.5 rounded-2xl bg-white/[0.03] border border-white/[0.08]">
-                    <div className="text-[10px] text-white/50 font-semibold uppercase tracking-wider">Health Score</div>
-                    <div className="text-2xl font-extrabold text-[#2dd4bf] mt-1">94 / 100</div>
-                    <div className="text-[9px] text-emerald-400 mt-0.5">Optimal Vitality</div>
+                <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                  <div className="p-2 sm:p-3.5 rounded-xl sm:rounded-2xl bg-white/[0.03] border border-white/[0.08]">
+                    <div className="text-[9px] sm:text-[10px] text-white/50 font-semibold uppercase tracking-wider truncate">Health Score</div>
+                    <div className="text-base sm:text-2xl font-extrabold text-[#2dd4bf] mt-0.5 sm:mt-1">94/100</div>
+                    <div className="text-[8px] sm:text-[9px] text-emerald-400 mt-0.5 truncate">Optimal Vitality</div>
                   </div>
-                  <div className="p-3.5 rounded-2xl bg-white/[0.03] border border-white/[0.08]">
-                    <div className="text-[10px] text-white/50 font-semibold uppercase tracking-wider">Active Calories</div>
-                    <div className="text-2xl font-extrabold text-amber-400 mt-1">1,840 kcal</div>
-                    <div className="text-[9px] text-emerald-400 mt-0.5">↑ 14% vs target</div>
+                  <div className="p-2 sm:p-3.5 rounded-xl sm:rounded-2xl bg-white/[0.03] border border-white/[0.08]">
+                    <div className="text-[9px] sm:text-[10px] text-white/50 font-semibold uppercase tracking-wider truncate">Active Cals</div>
+                    <div className="text-base sm:text-2xl font-extrabold text-amber-400 mt-0.5 sm:mt-1">1,840</div>
+                    <div className="text-[8px] sm:text-[9px] text-emerald-400 mt-0.5 truncate">↑ 14% target</div>
                   </div>
-                  <div className="p-3.5 rounded-2xl bg-white/[0.03] border border-white/[0.08]">
-                    <div className="text-[10px] text-white/50 font-semibold uppercase tracking-wider">Resting Pulse</div>
-                    <div className="text-2xl font-extrabold text-rose-400 mt-1">68 BPM</div>
-                    <div className="text-[9px] text-white/40 mt-0.5">Continuous HRV</div>
+                  <div className="p-2 sm:p-3.5 rounded-xl sm:rounded-2xl bg-white/[0.03] border border-white/[0.08]">
+                    <div className="text-[9px] sm:text-[10px] text-white/50 font-semibold uppercase tracking-wider truncate">Resting Pulse</div>
+                    <div className="text-base sm:text-2xl font-extrabold text-rose-400 mt-0.5 sm:mt-1">68 BPM</div>
+                    <div className="text-[8px] sm:text-[9px] text-white/40 mt-0.5 truncate">Continuous HRV</div>
                   </div>
                 </div>
 

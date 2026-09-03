@@ -344,7 +344,7 @@ export const InteractiveFeaturesShowcase: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
           
           {/* LEFT SIDE: Interactive Feature Navigation List */}
-          <div className="lg:col-span-5 space-y-2.5 max-h-[660px] overflow-y-auto pr-1 sm:pr-2 custom-scrollbar">
+          <div className="lg:col-span-5 flex lg:flex-col overflow-x-auto lg:overflow-y-auto gap-2 lg:gap-2.5 pb-2 lg:pb-0 max-h-none lg:max-h-[660px] pr-0 lg:pr-2 custom-scrollbar snap-x no-scrollbar">
             {FEATURES_DATA.map((feature) => {
               const IconComponent = feature.icon;
               const isActive = feature.id === activeFeatureId;
@@ -353,9 +353,9 @@ export const InteractiveFeaturesShowcase: React.FC = () => {
                 <motion.button
                   key={feature.id}
                   onClick={() => setActiveFeatureId(feature.id)}
-                  whileHover={{ x: 6 }}
+                  whileHover={{ x: 4 }}
                   whileTap={{ scale: 0.98 }}
-                  className={`w-full text-left p-4 sm:p-4.5 rounded-2xl border transition-all duration-300 relative overflow-hidden flex items-start gap-4 ${
+                  className={`flex-shrink-0 snap-start w-auto lg:w-full text-left p-3 sm:p-4 rounded-2xl border transition-all duration-300 relative overflow-hidden flex items-center lg:items-start gap-3 sm:gap-4 ${
                     isActive 
                       ? 'bg-white/[0.07] border-[#14b8a6]/60 shadow-[0_0_30px_rgba(20,184,166,0.2)] text-white' 
                       : 'bg-white/[0.02] border-white/[0.06] hover:bg-white/[0.04] hover:border-white/20 text-white/70'
@@ -363,26 +363,26 @@ export const InteractiveFeaturesShowcase: React.FC = () => {
                   aria-selected={isActive}
                   role="tab"
                 >
-                  {/* Left Active Glow Strip */}
+                  {/* Left Active Glow Strip (Desktop) */}
                   {isActive && (
                     <motion.div 
                       layoutId="activeGlowStrip" 
-                      className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-[#14b8a6] via-[#2dd4bf] to-cyan-400 rounded-r shadow-[0_0_12px_#2dd4bf]" 
+                      className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-[#14b8a6] via-[#2dd4bf] to-cyan-400 rounded-r shadow-[0_0_12px_#2dd4bf] hidden lg:block" 
                     />
                   )}
 
                   {/* Icon Box */}
-                  <div className={`p-2.5 rounded-xl border flex-shrink-0 transition-colors duration-300 ${
+                  <div className={`p-2 sm:p-2.5 rounded-xl border flex-shrink-0 transition-colors duration-300 ${
                     isActive 
                       ? 'bg-[#14b8a6]/25 border-[#14b8a6]/50 text-[#2dd4bf] shadow-[0_0_15px_rgba(45,212,191,0.4)]' 
                       : 'bg-white/[0.04] border-white/[0.08] text-white/60'
                   }`}>
-                    <IconComponent className="h-5 w-5" />
+                    <IconComponent className="h-4 w-4 sm:h-5 sm:w-5" />
                   </div>
 
                   {/* Content */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
+                    <div className="hidden lg:flex items-center justify-between">
                       <span className="text-[10px] font-semibold tracking-wider uppercase text-white/40 mb-0.5">
                         {feature.category}
                       </span>
@@ -394,18 +394,18 @@ export const InteractiveFeaturesShowcase: React.FC = () => {
                       )}
                     </div>
                     
-                    <h3 className={`text-base font-bold tracking-tight transition-colors ${
+                    <h3 className={`text-xs sm:text-base font-bold tracking-tight whitespace-nowrap lg:whitespace-normal transition-colors ${
                       isActive ? 'text-white' : 'text-white/85'
                     }`}>
                       {feature.title}
                     </h3>
                     
-                    <p className="text-xs text-white/55 line-clamp-1 mt-0.5 font-normal">
+                    <p className="hidden lg:block text-xs text-white/55 line-clamp-1 mt-0.5 font-normal">
                       {feature.tagline}
                     </p>
                   </div>
 
-                  <ChevronRight className={`h-4 w-4 flex-shrink-0 self-center transition-transform duration-300 ${
+                  <ChevronRight className={`hidden lg:block h-4 w-4 flex-shrink-0 self-center transition-transform duration-300 ${
                     isActive ? 'text-[#2dd4bf] translate-x-1' : 'text-white/20'
                   }`} />
                 </motion.button>

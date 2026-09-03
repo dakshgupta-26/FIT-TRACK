@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bell, Search, Sun, Moon, LogOut, Check } from 'lucide-react'; // Added Check icon
+import { Bell, Search, Sun, Moon, LogOut, Check, Menu } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
@@ -15,19 +15,20 @@ import { cn } from "@/lib/utils";
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useProfileImageMongo } from '@/hooks/useProfileImageMongo';
-import { useTranslation } from 'react-i18next'; // 1. Import the hook
+import { useTranslation } from 'react-i18next';
 
 interface HeaderProps {
   theme: string;
   setTheme: (theme: string) => void;
+  onToggleMobileMenu?: () => void;
 }
 
-export function Header({ theme, setTheme }: HeaderProps) {
+export function Header({ theme, setTheme, onToggleMobileMenu }: HeaderProps) {
   const { toast } = useToast();
   const { currentUser, logout } = useAuth();
   const { profileImageUrl, loadUserProfileImage } = useProfileImageMongo();
   const navigate = useNavigate();
-  const { i18n } = useTranslation(); // 2. Get the i18n instance
+  const { i18n } = useTranslation();
 
   // Load user profile image on component mount
   React.useEffect(() => {
@@ -61,7 +62,7 @@ export function Header({ theme, setTheme }: HeaderProps) {
     return currentUser?.email?.charAt(0).toUpperCase() || 'U';
   };
   
-  // 3. Create the language change handler
+  // Create the language change handler
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
     toast({
@@ -72,21 +73,32 @@ export function Header({ theme, setTheme }: HeaderProps) {
   };
 
   return (
-    <header className="bg-background border-b border-border py-3 px-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center md:w-72 lg:w-80">
-          <div className="relative w-full">
-            <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+    <header className="bg-background/95 backdrop-blur-md border-b border-border py-2.5 px-3 sm:px-6 sticky top-0 z-20">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 sm:gap-3 flex-1 max-w-md">
+          {/* Mobile Sidebar Hamburger Trigger */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onToggleMobileMenu}
+            className="lg:hidden rounded-xl text-foreground hover:bg-muted shrink-0 h-9 w-9"
+            aria-label="Toggle Menu"
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+
+          <div className="relative w-full max-w-[200px] sm:max-w-xs md:max-w-sm">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
             <Input
               placeholder="Search..."
-              className="pl-8 bg-background border border-input focus-visible:ring-2 w-full"
+              className="pl-8 h-9 text-xs sm:text-sm bg-background border border-input focus-visible:ring-2 w-full rounded-xl"
             />
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={toggleTheme} className="rounded-full">
-            {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+          <Button variant="ghost" size="icon" onClick={toggleTheme} className="rounded-full h-8 w-8 sm:h-9 sm:w-9">
+            {theme === 'dark' ? <Sun className="h-4 w-4 sm:h-5 sm:w-5" /> : <Moon className="h-4 w-4 sm:h-5 sm:w-5" />}
           </Button>
           
           <DropdownMenu>

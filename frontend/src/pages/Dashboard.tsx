@@ -115,10 +115,10 @@ const Dashboard = () => {
 
 
   return (
-    <div className="p-6 space-y-8 min-h-screen">
+    <div className="p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6 md:space-y-8 min-h-screen max-w-7xl mx-auto w-full">
       <PersonalizedGreeting />
 
-      <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-3 sm:gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
         <StatsCard title="Daily Steps" value="8,234" icon={<Activity className="h-5 w-5" />} trend={{ value: 12, isPositive: true }} className="animate-fade-in" />
         <StatsCard title="Calories Burned" value="546" icon={<Activity className="h-5 w-5" />} trend={{ value: 5, isPositive: true }} className="animate-fade-in [animation-delay:100ms]" />
         <StatsCard title="Active Minutes" value="68" icon={<Dumbbell className="h-5 w-5" />} trend={{ value: 8, isPositive: true }} className="animate-fade-in [animation-delay:200ms]" />
@@ -126,12 +126,12 @@ const Dashboard = () => {
         <QuickActions />
       </div>
 
-      <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-3">
         <HealthMetricChart title="Weekly Steps" data={weeklySteps} dataKey="value" className="lg:col-span-2" yAxisLabel="Steps" />
         <WaterIntakeTracker />
       </div>
 
-      <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-3">
         <MealTracker
           dailyTarget={dailyTarget}
           meals={meals}
@@ -144,18 +144,18 @@ const Dashboard = () => {
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-3 p-3 border rounded-md bg-gradient-to-r from-orange-500/5 to-red-500/5 hover:from-orange-500/10 hover:to-red-500/10 transition-all duration-300">
               <div className="p-2 rounded-full bg-gradient-to-br from-orange-500/20 to-red-500/20"><Dumbbell className="h-5 w-5 text-orange-500" /></div>
-              <div className="flex flex-col"><span className="font-medium">Upper Body Strength</span><span className="text-sm text-muted-foreground">45 min • 6 exercises</span></div>
+              <div className="flex flex-col min-w-0"><span className="font-medium truncate">Upper Body Strength</span><span className="text-sm text-muted-foreground truncate">45 min • 6 exercises</span></div>
             </div>
             <div className="flex items-center gap-3 p-3 border rounded-md bg-gradient-to-r from-blue-500/5 to-cyan-500/5 hover:from-blue-500/10 hover:to-cyan-500/10 transition-all duration-300">
               <div className="p-2 rounded-full bg-gradient-to-br from-blue-500/20 to-cyan-500/20"><Calendar className="h-5 w-5 text-blue-500" /></div>
-              <div className="flex flex-col"><span className="font-medium">Next: Cardio</span><span className="text-sm text-muted-foreground">Tomorrow • 30 min</span></div>
+              <div className="flex flex-col min-w-0"><span className="font-medium truncate">Next: Cardio</span><span className="text-sm text-muted-foreground truncate">Tomorrow • 30 min</span></div>
             </div>
             <Button onClick={handleStartWorkout} className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 shadow-lg hover:shadow-xl hover:shadow-orange-500/25 transition-all duration-300 hover:scale-105">Start Today's Workout</Button>
           </div>
         </DashboardCard>
       </div>
 
-      <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-3">
         <HealthMetricChart title="Weight Tracking" description="Your progress over time" data={weightData} strokeColor="hsl(var(--accent))" yAxisLabel="kg" />
 
         <DashboardCard title="Goals Progress" description="You're making good progress!">

@@ -27,10 +27,10 @@ export const ScrollableTimeline: React.FC<ScrollableTimelineProps> = ({
         <CardTitle>Daily Meal Timeline</CardTitle>
       </CardHeader>
       {/* THIS IS THE KEY FIX: A container with a max height and vertical scrolling */}
-      <CardContent className="max-h-[70vh] overflow-y-auto pr-4">
+      <CardContent className="max-h-[70vh] overflow-y-auto px-2 sm:px-6 pr-2 sm:pr-4">
         <div className="relative">
           {/* Vertical line that runs down the side */}
-          <div className="absolute left-16 top-0 bottom-0 w-px bg-border -ml-px"></div>
+          <div className="absolute left-12 sm:left-16 top-0 bottom-0 w-px bg-border -ml-px"></div>
 
           <div className="space-y-4">
             {hours.map((hour) => {
@@ -39,30 +39,30 @@ export const ScrollableTimeline: React.FC<ScrollableTimelineProps> = ({
                 .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 
               return (
-                <div key={hour} className="flex items-start gap-4">
-                  <div className="w-16 text-right text-sm font-semibold text-muted-foreground pt-3">
+                <div key={hour} className="flex items-start gap-2 sm:gap-4">
+                  <div className="w-12 sm:w-16 text-right text-xs sm:text-sm font-semibold text-muted-foreground pt-3 shrink-0">
                     {format(new Date().setHours(hour, 0), 'ha')}
                   </div>
-                  <div className="flex-1 space-y-2 pt-2">
+                  <div className="flex-1 space-y-2 pt-2 min-w-0">
                     {mealsInHour.length > 0 ? (
                       mealsInHour.map((meal) => (
                         <div key={meal.id} className="bg-muted/50 rounded-lg p-3 group relative">
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <p className="font-semibold text-foreground">{meal.name}</p>
+                          <div className="flex justify-between items-start pr-14 sm:pr-0">
+                            <div className="min-w-0">
+                              <p className="font-semibold text-foreground truncate">{meal.name}</p>
                               <p className="text-xs text-muted-foreground">{format(new Date(meal.timestamp), 'p')}</p>
                             </div>
-                            <p className="font-bold text-lg text-primary">{meal.nutrition.calories} <span className="text-xs font-normal text-muted-foreground">kcal</span></p>
+                            <p className="font-bold text-base sm:text-lg text-primary shrink-0">{meal.nutrition.calories} <span className="text-xs font-normal text-muted-foreground">kcal</span></p>
                           </div>
-                          {/* NEW: Display Protein, Carbs, and Fat */}
+                          {/* Display Protein, Carbs, and Fat */}
                           <div className="mt-2 pt-2 border-t border-border/50 flex justify-around text-xs text-muted-foreground">
                             <span><span className="font-bold text-green-500">{meal.nutrition.protein}</span>g P</span>
                             <span><span className="font-bold text-amber-500">{meal.nutrition.carbs}</span>g C</span>
                             <span><span className="font-bold text-sky-500">{meal.nutrition.fat}</span>g F</span>
                           </div>
-                          <div className="absolute top-2 right-2 flex opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onEditMeal(meal)}><Edit className="h-4 w-4" /></Button>
-                            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onDeleteMeal(meal.id)}><Trash2 className="h-4 w-4" /></Button>
+                          <div className="absolute top-2 right-2 flex opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                            <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground" onClick={() => onEditMeal(meal)}><Edit className="h-3.5 w-3.5" /></Button>
+                            <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => onDeleteMeal(meal.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
                           </div>
                         </div>
                       ))

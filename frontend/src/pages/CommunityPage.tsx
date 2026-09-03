@@ -65,88 +65,86 @@ export const CommunityPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#04060a] text-slate-100 p-4 sm:p-6 lg:p-8 font-sans pb-32">
-      {/* Header Badges & Actions */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-300 text-xs font-mono font-bold">
-              🌐 FitTracker Global Social Network
-            </span>
-            <span className="px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-mono font-bold flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping inline-block" />
-              Live Telemetry
-            </span>
+    <div className="min-h-screen bg-[#04060a] text-slate-100 font-sans pb-32">
+      <div className="relative z-10 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 space-y-6 sm:space-y-8">
+        {/* Header Title & CTA Actions */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block" />
+              <span className="text-[10px] font-mono text-emerald-400 font-bold uppercase tracking-wider">
+                Active Community Matrix
+              </span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black text-white mt-1 sm:mt-2">Fitness Social Network</h1>
+            <p className="text-xs text-slate-400 font-mono mt-1">
+              Connect with 50,000+ athletes • Share workout telemetry • WebRTC Live Streams
+            </p>
           </div>
-          <h1 className="text-3xl font-black text-white mt-2">Fitness Social Network</h1>
-          <p className="text-xs text-slate-400 font-mono mt-1">
-            Connect with 50,000+ athletes • Share workout telemetry • WebRTC Live Streams
-          </p>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => setIsLiveStreamOpen(true)}
+              className="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-2xl bg-rose-500/20 border border-rose-500/40 text-rose-300 font-bold text-xs flex items-center gap-1.5 hover:bg-rose-500 hover:text-white transition shadow-[0_0_15px_rgba(244,63,94,0.3)]"
+            >
+              <Video className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span>Go Live</span>
+            </button>
+
+            <button
+              onClick={() => setIsPrivacyModalOpen(true)}
+              className="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-2xl bg-slate-900 border border-white/10 text-slate-300 hover:text-white font-bold text-xs flex items-center gap-1.5 transition"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-teal-400" />
+              <span>Privacy</span>
+            </button>
+
+            <button
+              onClick={() => setIsCreatePostOpen(true)}
+              className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-2xl bg-gradient-to-r from-teal-400 to-cyan-400 text-slate-950 font-black text-xs flex items-center gap-2 shadow-[0_0_20px_rgba(45,212,191,0.4)] hover:shadow-[0_0_30px_rgba(45,212,191,0.6)] transition"
+            >
+              <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span>Create Post</span>
+            </button>
+          </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            onClick={() => setIsLiveStreamOpen(true)}
-            className="px-4 py-2.5 rounded-2xl bg-rose-500/20 border border-rose-500/40 text-rose-300 font-bold text-xs flex items-center gap-1.5 hover:bg-rose-500 hover:text-white transition shadow-[0_0_15px_rgba(244,63,94,0.3)]"
-          >
-            <Video className="w-4 h-4" />
-            <span>Go Live</span>
-          </button>
-
-          <button
-            onClick={() => setIsPrivacyModalOpen(true)}
-            className="px-4 py-2.5 rounded-2xl bg-slate-900 border border-white/10 text-slate-300 hover:text-white font-bold text-xs flex items-center gap-1.5 transition"
-          >
-            <ShieldCheck className="w-4 h-4 text-teal-400" />
-            <span>Privacy</span>
-          </button>
-
-          <button
-            onClick={() => setIsCreatePostOpen(true)}
-            className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-teal-400 to-cyan-400 text-slate-950 font-black text-xs flex items-center gap-2 shadow-[0_0_20px_rgba(45,212,191,0.4)] hover:shadow-[0_0_30px_rgba(45,212,191,0.6)] transition"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Create Post</span>
-          </button>
+        {/* Main Navigation Sub-Tabs */}
+        <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-4 mb-6 sm:mb-8 border-b border-white/10 no-scrollbar">
+          {[
+            { id: 'feed', label: '📰 Home Feed' },
+            { id: 'reels', label: '🎥 Fitness Reels' },
+            { id: 'leaderboard', label: '🏆 Leaderboards' },
+            { id: 'groups', label: '👥 Fitness Groups' },
+            { id: 'challenges', label: '🎯 Challenges' },
+            { id: 'chat', label: '💬 Messages' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as any)}
+              className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-2xl text-xs font-bold shrink-0 border transition ${
+                activeTab === tab.id
+                  ? 'bg-teal-500/20 border-teal-400 text-teal-300 shadow-[0_0_20px_rgba(45,212,191,0.2)]'
+                  : 'bg-slate-950/80 border-white/10 text-slate-400 hover:text-white'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
-      </div>
 
-      {/* Main Navigation Sub-Tabs */}
-      <div className="flex gap-2 overflow-x-auto pb-4 mb-8 border-b border-white/10">
-        {[
-          { id: 'feed', label: '📰 Home Feed' },
-          { id: 'reels', label: '🎥 Fitness Reels' },
-          { id: 'leaderboard', label: '🏆 Leaderboards' },
-          { id: 'groups', label: '👥 Fitness Groups' },
-          { id: 'challenges', label: '🎯 Challenges' },
-          { id: 'chat', label: '💬 Messages' },
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id as any)}
-            className={`px-5 py-2.5 rounded-2xl text-xs font-bold shrink-0 border transition ${
-              activeTab === tab.id
-                ? 'bg-teal-500/20 border-teal-400 text-teal-300 shadow-[0_0_20px_rgba(45,212,191,0.2)]'
-                : 'bg-slate-950/80 border-white/10 text-slate-400 hover:text-white'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Main Content Layout (Grid) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Main Feed / Reels / Chat Area (8 Cols) */}
-        <div className="lg:col-span-8 space-y-6">
-          {/* TAB 1: HOME FEED */}
-          {activeTab === 'feed' && (
-            <div className="space-y-6">
-              {posts.map((post) => (
-                <div
-                  key={post.id}
-                  className="p-6 rounded-3xl bg-slate-950/90 border border-white/10 backdrop-blur-2xl space-y-4 shadow-xl"
-                >
+        {/* Main Content Layout (Grid) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
+          {/* Main Feed / Reels / Chat Area (8 Cols) */}
+          <div className="lg:col-span-8 space-y-4 sm:space-y-6">
+            {/* TAB 1: HOME FEED */}
+            {activeTab === 'feed' && (
+              <div className="space-y-4 sm:space-y-6">
+                {posts.map((post) => (
+                  <div
+                    key={post.id}
+                    className="p-4 sm:p-6 rounded-3xl bg-slate-950/90 border border-white/10 backdrop-blur-2xl space-y-4 shadow-xl"
+                  >
                   {/* Post Author Bar */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -428,6 +426,7 @@ export const CommunityPage: React.FC = () => {
         onClose={() => setIsPrivacyModalOpen(false)}
       />
     </div>
+  </div>
   );
 };
 

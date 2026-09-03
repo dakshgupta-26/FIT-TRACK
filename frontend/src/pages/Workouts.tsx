@@ -261,20 +261,20 @@ const Workouts = () => {
   };
 
   return (
-    <div className="p-6 space-y-8">
+    <div className="p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6 md:space-y-8 max-w-7xl mx-auto w-full">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+          <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             Workout Library
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
             Discover personalized workouts • {isLoading ? 'Loading workouts...' : `${filteredWorkouts.length} workouts available`}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <WorkoutFilters filters={filters} onFiltersChange={setFilters} />
-          <Button onClick={handleCreateWorkout} className="h-10 px-6">
+          <Button onClick={handleCreateWorkout} className="h-10 px-4 sm:px-6">
             <Plus className="h-4 w-4 mr-2" />
             Create Workout
           </Button>
@@ -291,14 +291,16 @@ const Workouts = () => {
           <Loader2 className="h-12 w-12 animate-spin text-primary" />
         </div>
       ) : (
-        <Tabs defaultValue="all">
-          <TabsList className="mb-6">
-            <TabsTrigger value="all">All Workouts</TabsTrigger>
-            <TabsTrigger value="strength">Strength</TabsTrigger>
-            <TabsTrigger value="cardio">Cardio</TabsTrigger>
-            <TabsTrigger value="flexibility">Flexibility</TabsTrigger>
-            <TabsTrigger value="favorites">Favorites</TabsTrigger>
-          </TabsList>
+        <Tabs defaultValue="all" className="w-full">
+          <div className="overflow-x-auto pb-2 no-scrollbar">
+            <TabsList className="mb-6 w-full justify-start sm:justify-center flex-nowrap min-w-max">
+              <TabsTrigger value="all">All Workouts</TabsTrigger>
+              <TabsTrigger value="strength">Strength</TabsTrigger>
+              <TabsTrigger value="cardio">Cardio</TabsTrigger>
+              <TabsTrigger value="flexibility">Flexibility</TabsTrigger>
+              <TabsTrigger value="favorites">Favorites</TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="all" className="mt-0">
             {filteredWorkouts.length > 0 ? (

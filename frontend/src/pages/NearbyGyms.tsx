@@ -177,8 +177,8 @@ const NearbyGyms: React.FC = () => {
 
       {/* Split-Screen Main Discovery Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* LEFT: Hero Interactive Map (70% width on Desktop = 8 columns) */}
-        <div className="lg:col-span-8 h-[550px] sm:h-[650px] lg:h-[760px] sticky top-6">
+        {/* LEFT: Hero Interactive Map */}
+        <div className="lg:col-span-8 h-[280px] sm:h-[380px] lg:h-[760px] lg:sticky top-6 rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
           <GymMap
             gyms={filteredGyms}
             selectedGym={selectedGym}

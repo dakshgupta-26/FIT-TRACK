@@ -232,7 +232,7 @@ const PlaylistCreator = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Search Section */}
         <div className="lg:col-span-2 space-y-4">
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -243,21 +243,23 @@ const PlaylistCreator = () => {
                 className="pl-10"
               />
             </div>
-            <Button onClick={searchSpotify} disabled={isLoading}>
-              {isLoading ? 'Searching...' : 'Search'}
-            </Button>
-            <Button
-              variant={searchType === 'track' ? 'default' : 'outline'}
-              onClick={() => setSearchType('track')}
-            >
-              Songs
-            </Button>
-            <Button
-              variant={searchType === 'artist' ? 'default' : 'outline'}
-              onClick={() => setSearchType('artist')}
-            >
-              Artists
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={searchSpotify} disabled={isLoading} className="flex-1 sm:flex-none">
+                {isLoading ? 'Searching...' : 'Search'}
+              </Button>
+              <Button
+                variant={searchType === 'track' ? 'default' : 'outline'}
+                onClick={() => setSearchType('track')}
+              >
+                Songs
+              </Button>
+              <Button
+                variant={searchType === 'artist' ? 'default' : 'outline'}
+                onClick={() => setSearchType('artist')}
+              >
+                Artists
+              </Button>
+            </div>
           </div>
 
           {/* Search Results */}

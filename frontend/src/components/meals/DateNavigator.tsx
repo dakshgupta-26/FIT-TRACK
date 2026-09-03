@@ -19,24 +19,22 @@ export const DateNavigator: React.FC<DateNavigatorProps> = ({ selectedDate, onDa
   // ... (handler functions are the same)
 
   return (
-    // CHANGED: Replaced bg-gray-800 with bg-muted for theme awareness
-    <div className="flex items-center justify-center gap-4 p-2 bg-muted rounded-lg mb-6">
-      <Button variant="ghost" size="icon" onClick={() => onDateChange(new Date(selectedDate.setDate(selectedDate.getDate() - 1)))}>
-        <ChevronLeft className="h-6 w-6" />
+    <div className="flex items-center justify-between sm:justify-center gap-1 sm:gap-4 p-1.5 sm:p-2 bg-muted rounded-xl mb-6 w-full max-w-md mx-auto">
+      <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-9 sm:w-9 shrink-0" onClick={() => onDateChange(new Date(selectedDate.setDate(selectedDate.getDate() - 1)))}>
+        <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
       </Button>
 
       <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
         <PopoverTrigger asChild>
-          {/* CHANGED: Replaced variant="outline" with a more theme-friendly style */}
           <Button
             variant={"ghost"}
             className={cn(
-              "w-[280px] justify-start text-left font-normal text-foreground",
+              "flex-1 max-w-[220px] sm:max-w-[280px] justify-center sm:justify-start text-center sm:text-left font-normal text-foreground text-xs sm:text-sm px-2 sm:px-4",
               !selectedDate && "text-muted-foreground"
             )}
           >
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            {selectedDate ? format(selectedDate, "EEEE, MMMM d") : <span>Pick a date</span>}
+            <CalendarIcon className="mr-1.5 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+            <span className="truncate">{selectedDate ? format(selectedDate, "EEE, MMM d, yyyy") : "Pick a date"}</span>
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0">

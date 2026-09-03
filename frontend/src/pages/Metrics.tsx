@@ -165,57 +165,59 @@ const Metrics = () => {
   };
 
   return (
-    <div className="p-6 space-y-8">
-      <div className="flex justify-between items-center">
+    <div className="p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6 md:space-y-8 max-w-7xl mx-auto w-full">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Health Metrics</h1>
-          <p className="text-muted-foreground">Track and monitor your health indicators</p>
+          <h1 className="text-2xl sm:text-3xl font-bold">Health Metrics</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground">Track and monitor your health indicators</p>
         </div>
         <AddMeasurementModal onMeasurementAdded={handleMeasurementAdded} />
       </div>
       
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-4">
         {recentMeasurements.map((measurement, idx) => (
-          <Card key={idx}>
-            <CardHeader className="pb-2 pt-4">
+          <Card key={idx} className="p-1 sm:p-0">
+            <CardHeader className="pb-1 sm:pb-2 pt-3 sm:pt-4 px-3 sm:px-6">
               <div className="flex justify-between items-start">
-                <CardTitle className="text-sm font-medium text-muted-foreground">{measurement.name}</CardTitle>
-                <div className="p-1.5 rounded-full bg-primary/10 text-primary">
-                  <measurement.icon className="h-3.5 w-3.5" />
+                <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground truncate">{measurement.name}</CardTitle>
+                <div className="p-1 sm:p-1.5 rounded-full bg-primary/10 text-primary shrink-0">
+                  <measurement.icon className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-1">
-                <div className="text-2xl font-bold">{measurement.value}</div>
-                <p className="text-xs text-muted-foreground">{measurement.date}</p>
+            <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
+              <div className="space-y-0.5 sm:space-y-1">
+                <div className="text-base sm:text-2xl font-bold truncate">{measurement.value}</div>
+                <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{measurement.date}</p>
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
       
-      <Tabs defaultValue="weight">
-        <TabsList className="mb-6">
-          <TabsTrigger value="weight">Weight</TabsTrigger>
-          <TabsTrigger value="heart-rate">Heart Rate</TabsTrigger>
-          <TabsTrigger value="sleep">Sleep</TabsTrigger>
-          <TabsTrigger value="blood-pressure">Blood Pressure</TabsTrigger>
-        </TabsList>
+      <Tabs defaultValue="weight" className="w-full">
+        <div className="overflow-x-auto pb-2 no-scrollbar">
+          <TabsList className="mb-6 w-full justify-start sm:justify-center flex-nowrap min-w-max">
+            <TabsTrigger value="weight">Weight</TabsTrigger>
+            <TabsTrigger value="heart-rate">Heart Rate</TabsTrigger>
+            <TabsTrigger value="sleep">Sleep</TabsTrigger>
+            <TabsTrigger value="blood-pressure">Blood Pressure</TabsTrigger>
+          </TabsList>
+        </div>
         
         <TabsContent value="weight" className="mt-0">
           <Card>
             <CardHeader>
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <CardTitle>Weight Tracking</CardTitle>
-                  <CardDescription>Your progress over time</CardDescription>
+                  <CardTitle className="text-lg sm:text-xl">Weight Tracking</CardTitle>
+                  <CardDescription className="text-xs sm:text-sm">Your progress over time</CardDescription>
                 </div>
-                <div className="flex gap-2 text-sm">
-                  <Button variant="outline" size="sm">1M</Button>
-                  <Button variant="outline" size="sm" className="bg-primary/5">3M</Button>
-                  <Button variant="outline" size="sm">6M</Button>
-                  <Button variant="outline" size="sm">1Y</Button>
+                <div className="flex flex-wrap gap-1.5 sm:gap-2 text-xs sm:text-sm">
+                  <Button variant="outline" size="sm" className="h-8 px-2.5 sm:px-3 text-xs">1M</Button>
+                  <Button variant="outline" size="sm" className="h-8 px-2.5 sm:px-3 text-xs bg-primary/5">3M</Button>
+                  <Button variant="outline" size="sm" className="h-8 px-2.5 sm:px-3 text-xs">6M</Button>
+                  <Button variant="outline" size="sm" className="h-8 px-2.5 sm:px-3 text-xs">1Y</Button>
                 </div>
               </div>
             </CardHeader>

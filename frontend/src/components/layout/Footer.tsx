@@ -377,12 +377,12 @@ export const Footer: React.FC = () => {
           <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-8 text-xs font-normal">
             
             {/* LEFT: Copyright Notice */}
-            <div className="flex items-center justify-center lg:justify-start gap-2.5 text-white/50 text-center lg:text-left whitespace-nowrap">
+            <div className="flex items-center justify-center lg:justify-start gap-2.5 text-white/50 text-center lg:text-left text-xs">
               <span className="font-medium text-white/70">© 2026 FitTracker. All rights reserved.</span>
             </div>
 
             {/* CENTER: Legal Links (Privacy, Terms, Cookies, Accessibility, Contact) */}
-            <nav aria-label="Legal navigation" className="flex items-center justify-center gap-5 sm:gap-8 whitespace-nowrap">
+            <nav aria-label="Legal navigation" className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 sm:gap-6 text-xs">
               {legalLinks.map((link, index) => (
                 <React.Fragment key={link.name}>
                   <div className="relative group/link py-1">

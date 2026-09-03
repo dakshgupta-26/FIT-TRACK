@@ -95,15 +95,15 @@ export const PublicPageLayout: React.FC<PublicPageLayoutProps> = ({
             <p className="text-white/65 max-w-xl mx-auto text-sm sm:text-base">
               Join over 50,000 users building healthier daily habits with AI-powered guidance on FitTracker.
             </p>
-            <div className="flex items-center justify-center gap-4 pt-2">
-              <Button asChild size="lg" className="bg-[#14b8a6] hover:bg-[#0d9488] text-white px-8 rounded-xl shadow-[0_0_25px_rgba(20,184,166,0.3)]">
-                <Link to="/signup" className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-2">
+              <Button asChild size="lg" className="w-full sm:w-auto bg-[#14b8a6] hover:bg-[#0d9488] text-white px-8 rounded-xl shadow-[0_0_25px_rgba(20,184,166,0.3)]">
+                <Link to="/signup" className="flex items-center justify-center gap-2">
                   <span>Start Free Trial</span>
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/[0.06] rounded-xl">
-                <Link to="/features">Explore Features</Link>
+              <Button asChild size="lg" variant="outline" className="w-full sm:w-auto border-white/20 text-white hover:bg-white/[0.06] rounded-xl">
+                <Link to="/features" className="text-center">Explore Features</Link>
               </Button>
             </div>
           </div>

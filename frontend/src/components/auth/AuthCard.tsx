@@ -158,7 +158,7 @@ export const AuthCard: React.FC<AuthCardProps> = ({ initialMode }) => {
       key={shakeKey}
       animate={shakeKey > 0 ? { x: [-10, 10, -8, 8, -4, 4, 0] } : {}}
       transition={{ duration: 0.4 }}
-      className="relative w-full max-w-[470px] rounded-[32px] bg-slate-950/75 border border-white/10 backdrop-blur-2xl px-6 py-5 sm:px-7 sm:py-6 shadow-[0_25px_60px_rgba(0,0,0,0.95),0_0_50px_rgba(20,184,166,0.18)] overflow-hidden text-white font-sans shrink-0"
+      className="relative w-full max-w-[470px] rounded-2xl sm:rounded-[32px] bg-slate-950/75 border border-white/10 backdrop-blur-2xl px-4 py-4 sm:px-7 sm:py-6 shadow-[0_25px_60px_rgba(0,0,0,0.95),0_0_50px_rgba(20,184,166,0.18)] overflow-hidden text-white font-sans shrink-0"
     >
       {/* Background Volumetric Glow Accents */}
       <div className="absolute -top-24 -left-24 w-48 h-48 rounded-full bg-teal-500/20 blur-3xl pointer-events-none" />

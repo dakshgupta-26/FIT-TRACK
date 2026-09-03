@@ -63,30 +63,30 @@ export function PersonalizedGreeting() {
   return (
     <Card className="relative overflow-hidden bg-gradient-to-r from-primary/10 via-accent/10 to-secondary/10 border-0 shadow-lg">
       <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-accent/5 animate-pulse-gentle" />
-      <div className="relative p-6">
-        <div className="flex items-center gap-4">
-          <Avatar className="h-16 w-16 ring-2 ring-primary/20 ring-offset-2 ring-offset-background">
+      <div className="relative p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+          <Avatar className="h-12 w-12 sm:h-16 sm:w-16 ring-2 ring-primary/20 ring-offset-2 ring-offset-background shrink-0">
             <AvatarImage 
               src={profileImageUrl || currentUser?.photoURL || ""} 
               alt="Profile" 
             />
-            <AvatarFallback className="bg-primary/10 text-primary font-semibold text-lg">
+            <AvatarFallback className="bg-primary/10 text-primary font-semibold text-base sm:text-lg">
               {getUserInitials()}
             </AvatarFallback>
           </Avatar>
           
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <GreetingIcon className="h-5 w-5 text-primary" />
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <GreetingIcon className="h-4 w-4 sm:h-5 sm:w-5 text-primary shrink-0" />
+              <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent truncate">
                 {greeting.text}, {getUserName()}!
               </h1>
             </div>
-            <p className="text-muted-foreground mb-2">Here's your health summary for today</p>
+            <p className="text-xs sm:text-sm text-muted-foreground mb-1.5">Here's your health summary for today</p>
             
-            <div className="flex items-center gap-2 text-sm">
-              <Sparkles className="h-4 w-4 text-primary animate-pulse" />
-              <span className="text-primary font-medium italic">{quote}</span>
+            <div className="flex items-center gap-2 text-xs sm:text-sm">
+              <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary animate-pulse shrink-0" />
+              <span className="text-primary font-medium italic truncate">{quote}</span>
             </div>
           </div>
         </div>

@@ -114,19 +114,19 @@ export const StickyMusicPlayer: React.FC<StickyMusicPlayerProps> = ({
         </div>
 
         {/* Live Telemetry Bar Inside Player */}
-        <div className="flex items-center justify-between text-[11px] font-mono text-slate-300 pt-2 border-t border-white/10">
+        <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-mono text-slate-300 pt-2 border-t border-white/10 flex-wrap gap-1.5">
           <div className="flex items-center gap-1.5 text-rose-400 font-bold">
-            <Activity className="w-3.5 h-3.5 animate-pulse" />
+            <Activity className="w-3 h-3 sm:w-3.5 sm:h-3.5 animate-pulse" />
             <span>{userHeartRate} BPM Sync</span>
           </div>
 
           <div className="flex items-center gap-1.5 text-amber-300 font-bold">
-            <Flame className="w-3.5 h-3.5" />
+            <Flame className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             <span>{currentTrack.bpm} BPM Cadence</span>
           </div>
 
           <div className="flex items-center gap-1.5 text-teal-300 font-bold">
-            <Headphones className="w-3.5 h-3.5" />
+            <Headphones className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             <span>AirPods Max</span>
           </div>
         </div>
@@ -139,7 +139,7 @@ export const StickyMusicPlayer: React.FC<StickyMusicPlayerProps> = ({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="fixed bottom-32 right-6 w-96 p-5 rounded-3xl bg-slate-950/95 border border-teal-400/50 backdrop-blur-2xl shadow-2xl z-50 text-white font-sans space-y-3"
+            className="fixed bottom-28 left-4 right-4 sm:left-auto sm:right-6 sm:w-96 p-4 sm:p-5 rounded-3xl bg-slate-950/95 border border-teal-400/50 backdrop-blur-2xl shadow-2xl z-50 text-white font-sans space-y-3 max-h-[50vh] overflow-y-auto"
           >
             <div className="flex justify-between items-center border-b border-white/10 pb-2">
               <span className="text-xs font-mono font-bold text-teal-300 uppercase tracking-wider">

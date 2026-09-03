@@ -82,23 +82,23 @@ export function ChatBot() {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col items-end">
       {isOpen && (
-        <Card className="w-96 h-[500px] mb-4 shadow-lg animate-scale-in flex flex-col">
-          <CardHeader className="p-4 border-b">
+        <Card className="w-[calc(100vw-2rem)] sm:w-96 max-h-[75vh] h-[480px] mb-3 sm:mb-4 shadow-2xl animate-scale-in flex flex-col rounded-2xl overflow-hidden border bg-card">
+          <CardHeader className="p-3 sm:p-4 border-b shrink-0">
             <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2 text-lg">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                 <Bot className="h-5 w-5 text-primary" />
                 Health Assistant
               </CardTitle>
-              <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="h-8 w-8">
+              <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="h-8 w-8 rounded-full">
                 <X className="h-4 w-4" />
               </Button>
             </div>
           </CardHeader>
 
-          <CardContent className="p-0 flex-1 flex flex-col max-h-[400px] overflow-y-auto">
-            <div className="flex-1 p-4 space-y-4">
+          <CardContent className="p-0 flex-1 flex flex-col overflow-y-auto">
+            <div className="flex-1 p-3 sm:p-4 space-y-3 sm:space-y-4 overflow-y-auto">
               {messages.map((message) => (
                 <div
                   key={message.id}
@@ -106,7 +106,7 @@ export function ChatBot() {
                 >
                   <div
                     className={cn(
-                      "max-w-[80%] p-3 rounded-lg text-sm break-words",
+                      "max-w-[85%] p-2.5 sm:p-3 rounded-xl text-xs sm:text-sm break-words",
                       message.isUser
                         ? "bg-primary text-primary-foreground"
                         : "bg-muted"
@@ -118,34 +118,40 @@ export function ChatBot() {
               <div ref={messagesEndRef} />
             </div>
           </CardContent>
+
+          {/* Integrated Input Form Footer */}
+          <div className="p-2.5 sm:p-3 border-t bg-card shrink-0">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSendMessage();
+              }}
+              className="flex gap-2"
+            >
+              <Input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Ask health assistant..."
+                className="h-9 text-xs sm:text-sm rounded-xl"
+              />
+              <Button type="submit" size="icon" className="h-9 w-9 rounded-xl shrink-0">
+                <Send className="h-4 w-4" />
+              </Button>
+            </form>
+          </div>
         </Card>
       )}
 
       <Button
         onClick={() => setIsOpen(!isOpen)}
-        className="rounded-full w-14 h-14 shadow-lg"
+        className="rounded-full w-12 h-12 sm:w-14 sm:h-14 shadow-2xl"
         size="icon"
+        aria-label="Open AI Health Assistant"
       >
-        <MessageCircle className="h-6 w-6" />
+        <MessageCircle className="h-5 w-5 sm:h-6 sm:w-6" />
       </Button>
-
-      <div className="fixed bottom-6 right-6 z-50 w-96">
-        {isOpen && (
-          <div className="p-4 border-t">
-            <div className="flex gap-2">
-              <Input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask me anything about health..."
-                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              />
-              <Button onClick={handleSendMessage} size="icon">
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        )}
-      </div>
     </div>
   );
 }
+
+export default ChatBot;
