@@ -28,8 +28,10 @@ export const useHealthMetrics = () => {
   const [error, setError] = useState<string | null>(null);
   const { currentUser } = useAuth();
 
+  const userUid = currentUser?.uid || currentUser?._id;
+
   const fetchMetrics = useCallback(async (type?: string, limit = 100) => {
-    if (!currentUser?.uid) return;
+    if (!userUid) return;
 
     setLoading(true);
     setError(null);
@@ -38,7 +40,7 @@ export const useHealthMetrics = () => {
       const params = new URLSearchParams({ limit: limit.toString() });
       if (type) params.append('type', type);
       
-      const { data: result } = await apiClient.get(`/health-metrics/${currentUser.uid}?${params}`);
+      const { data: result } = await apiClient.get(`/health-metrics/${userUid}?${params}`);
 
       if (result.success) {
         setMetrics(result.metrics);
@@ -51,13 +53,13 @@ export const useHealthMetrics = () => {
     } finally {
       setLoading(false);
     }
-  }, [currentUser?.uid]);
+  }, [userUid]);
 
   const fetchSummary = useCallback(async () => {
-    if (!currentUser?.uid) return;
+    if (!userUid) return;
 
     try {
-      const { data: result } = await apiClient.get(`/health-metrics/${currentUser.uid}/summary`);
+      const { data: result } = await apiClient.get(`/health-metrics/${userUid}/summary`);
 
       if (result.success) {
         setSummary(result.summary);
@@ -67,13 +69,13 @@ export const useHealthMetrics = () => {
     } catch (err) {
       console.error('Error fetching health metrics summary:', err);
     }
-  }, [currentUser?.uid]);
+  }, [userUid]);
 
   const addMetric = async (type: string, value: number, unit: string, date: string, notes?: string) => {
-    if (!currentUser?.uid) throw new Error('User not authenticated');
+    if (!userUid) throw new Error('User not authenticated');
 
     const { data: result } = await apiClient.post('/health-metrics', {
-      uid: currentUser.uid,
+      uid: userUid,
       type,
       value,
       unit,

@@ -2,10 +2,18 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Send, Image, Dumbbell, Sparkles, CheckCheck, Paperclip, Smile } from 'lucide-react';
 import { sampleChatMessages, ChatMessage } from '@/data/communityData';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const CommunityChatView: React.FC = () => {
+  const { currentUser } = useAuth();
   const [messages, setMessages] = useState<ChatMessage[]>(sampleChatMessages);
   const [inputText, setInputText] = useState('');
+
+  const userName = currentUser?.firstName
+    ? `${currentUser.firstName} ${currentUser.lastName || ''}`.trim()
+    : currentUser?.email?.split('@')[0] || 'Athlete';
+
+  const userAvatar = currentUser?.profileImageUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=300&auto=format&fit=crop';
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
@@ -13,9 +21,9 @@ export const CommunityChatView: React.FC = () => {
 
     const newMsg: ChatMessage = {
       id: `msg-${Date.now()}`,
-      senderId: 'user-me',
-      senderName: 'Daksh Gupta',
-      senderAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=300&auto=format&fit=crop',
+      senderId: currentUser?._id || 'user-me',
+      senderName: userName,
+      senderAvatar: userAvatar,
       text: inputText,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       isMe: true,

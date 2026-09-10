@@ -71,19 +71,19 @@ export const Settings: React.FC = () => {
   const [account, setAccount] = useState({
     firstName: '',
     lastName: '',
-    username: 'athlete_prime',
+    username: '',
     email: '',
-    phone: '+1 (555) 234-5678',
-    emergencyContact: '+1 (555) 987-6543 (Sarah - Partner)',
+    phone: '',
+    emergencyContact: '',
   });
 
   const [healthGoals, setHealthGoals] = useState({
-    targetWeight: '72.0',
-    dailyCalories: '2800',
-    dailyWater: '3.5',
+    targetWeight: '',
+    dailyCalories: '2000',
+    dailyWater: '2.5',
     sleepGoal: '8.0',
-    workoutDays: '5',
-    heartRateAlert: '165',
+    workoutDays: '4',
+    heartRateAlert: '160',
     hydrationAlerts: true,
     recoveryTracking: true,
   });
@@ -140,10 +140,17 @@ export const Settings: React.FC = () => {
     if (currentUser) {
       setAccount((prev) => ({
         ...prev,
-        firstName: currentUser.firstName || 'Athlete',
+        firstName: currentUser.firstName || '',
         lastName: currentUser.lastName || '',
         email: currentUser.email || '',
+        username: currentUser.email?.split('@')[0] || '',
       }));
+      if (currentUser.weight) {
+        setHealthGoals((prev) => ({
+          ...prev,
+          targetWeight: currentUser.weight || '',
+        }));
+      }
     }
   }, [currentUser]);
 
@@ -153,17 +160,20 @@ export const Settings: React.FC = () => {
     setIsSaving(true);
     try {
       if (currentUser) {
-        await api.put('/user/profile', {
+        const response = await api.put('/user/profile', {
           firstName: account.firstName,
           lastName: account.lastName,
-          height: '182',
-          weight: healthGoals.targetWeight,
-        }).catch(() => {});
+          height: currentUser.height || '',
+          weight: healthGoals.targetWeight || currentUser.weight || '',
+        });
+        if (response.data) {
+          updateUserData(response.data);
+        }
       }
       setIsDirty(false);
       toast({
-        title: '⚡ FitTracker OS Configured',
-        description: 'AI Control Center parameters saved to ecosystem cloud.',
+        title: '⚡ Settings Saved',
+        description: 'Account settings updated successfully.',
       });
     } catch (err: any) {
       toast({ title: 'Save Failed', description: err.message || 'Error updating settings', variant: 'destructive' });
@@ -250,21 +260,23 @@ export const Settings: React.FC = () => {
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-white/5 space-y-1">
-                  <span className="text-[9px] font-mono text-slate-400 uppercase">Active Goal</span>
-                  <div className="text-xs font-bold text-white truncate">Hypertrophy & Shred</div>
-                </div>
-
-                <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-white/5 space-y-1">
-                  <span className="text-[9px] font-mono text-slate-400 uppercase">Consistency</span>
-                  <div className="text-xs font-bold text-orange-400 flex items-center gap-1">
-                    <Flame className="w-3 h-3 fill-orange-400" /> 18-Day Streak
+                  <span className="text-[9px] font-mono text-slate-400 uppercase">Active Profile</span>
+                  <div className="text-xs font-bold text-white truncate">
+                    {currentUser?.firstName ? `${currentUser.firstName} ${currentUser.lastName || ''}`.trim() : 'Active Member'}
                   </div>
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-white/5 space-y-1">
-                  <span className="text-[9px] font-mono text-slate-400 uppercase">Hardware Synced</span>
+                  <span className="text-[9px] font-mono text-slate-400 uppercase">Cloud Sync</span>
+                  <div className="text-xs font-bold text-teal-400 flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3" /> Live
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-white/5 space-y-1">
+                  <span className="text-[9px] font-mono text-slate-400 uppercase">Device Network</span>
                   <div className="text-xs font-bold text-cyan-400 flex items-center gap-1">
-                    <Watch className="w-3 h-3" /> 5 Devices
+                    <Watch className="w-3 h-3" /> Configured
                   </div>
                 </div>
               </div>
@@ -507,8 +519,9 @@ export const Settings: React.FC = () => {
                       <input
                         type="text"
                         value={account.phone}
+                        placeholder="e.g. +1 (555) 000-0000"
                         onChange={(e) => { setAccount({ ...account, phone: e.target.value }); markDirty(); }}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-white/10 text-xs text-white"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-white/10 text-xs text-white placeholder:text-slate-600"
                       />
                     </div>
                   </div>
@@ -530,8 +543,9 @@ export const Settings: React.FC = () => {
                       <input
                         type="number"
                         value={healthGoals.targetWeight}
+                        placeholder="e.g. 70"
                         onChange={(e) => { setHealthGoals({ ...healthGoals, targetWeight: e.target.value }); markDirty(); }}
-                        className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-white/10 text-xs text-white font-bold"
+                        className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-white/10 text-xs text-white font-bold placeholder:text-slate-600"
                       />
                     </div>
 

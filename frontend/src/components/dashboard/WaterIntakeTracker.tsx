@@ -4,23 +4,47 @@ import { Button } from "@/components/ui/button";
 import { DashboardCard } from "./DashboardCard";
 import { Plus, Minus } from 'lucide-react';
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface WaterIntakeTrackerProps {
   className?: string;
 }
 
 export function WaterIntakeTracker({ className }: WaterIntakeTrackerProps) {
+  const { currentUser } = useAuth();
+  const userId = currentUser?._id || currentUser?.uid || 'guest';
+  const todayKey = new Date().toISOString().split('T')[0];
+  const storageKey = `waterGlasses_${userId}_${todayKey}`;
+
   const [glasses, setGlasses] = useState(() => {
-    // Load from localStorage or default to 0
-    const saved = localStorage.getItem('waterGlasses');
-    return saved ? parseInt(saved) : 0;
+    try {
+      const saved = localStorage.getItem(storageKey);
+      return saved ? parseInt(saved, 10) : 0;
+    } catch {
+      return 0;
+    }
   });
+
+  // Re-sync glasses if currentUser or today changes
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(storageKey);
+      setGlasses(saved ? parseInt(saved, 10) : 0);
+    } catch {
+      setGlasses(0);
+    }
+  }, [storageKey]);
+
   const target = 8;
 
   // Save to localStorage whenever glasses change
   useEffect(() => {
-    localStorage.setItem('waterGlasses', glasses.toString());
-  }, [glasses]);
+    try {
+      localStorage.setItem(storageKey, glasses.toString());
+    } catch (e) {
+      console.warn("Could not save water intake", e);
+    }
+  }, [glasses, storageKey]);
 
   const addGlass = () => {
     if (glasses < target) {

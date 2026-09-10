@@ -7,8 +7,8 @@ import { useAuth } from '../contexts/AuthContext'; // 1. Import your auth hook
 const Progress: React.FC = () => {
   const { currentUser } = useAuth(); // 2. Get the logged-in user
   
-  // 3. Pass the user's UID to the useProgress hook
-  const { entries, loading, error, addProgressEntry, deleteProgressEntry } = useProgress(currentUser?.uid);
+  // 3. Pass user login status to the useProgress hook
+  const { entries, loading, error, addProgressEntry, deleteProgressEntry } = useProgress(Boolean(currentUser));
 
   return (
     <div className="p-4 sm:p-6 md:p-8">

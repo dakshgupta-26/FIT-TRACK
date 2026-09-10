@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Sparkles, Image, Flame, Activity, Heart, Send, Dumbbell, MapPin } from 'lucide-react';
 import { CommunityPost } from '@/data/communityData';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface CreatePostModalProps {
   isOpen: boolean;
@@ -14,6 +15,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
   onClose,
   onPostCreated,
 }) => {
+  const { currentUser } = useAuth();
   const [caption, setCaption] = useState('');
   const [postType, setPostType] = useState<'workout' | 'transformation' | 'meal'>('workout');
   const [imageUrl, setImageUrl] = useState('');
@@ -25,6 +27,11 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
 
   if (!isOpen) return null;
 
+  const authorName = currentUser?.firstName
+    ? `${currentUser.firstName} ${currentUser.lastName || ''}`.trim()
+    : currentUser?.email?.split('@')[0] || 'Athlete';
+  const authorAvatar = currentUser?.profileImageUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=300&auto=format&fit=crop';
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -33,9 +40,9 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
       setIsSubmitting(false);
       const newPost: CommunityPost = {
         id: `post-${Date.now()}`,
-        authorName: 'Daksh Gupta',
-        authorAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=300&auto=format&fit=crop',
-        authorBadge: 'PRO MEMBER',
+        authorName,
+        authorAvatar,
+        authorBadge: 'MEMBER',
         timeAgo: 'Just now',
         type: postType,
         caption,

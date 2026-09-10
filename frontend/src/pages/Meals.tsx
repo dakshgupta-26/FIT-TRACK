@@ -34,19 +34,37 @@ const Meals = () => {
   const { currentUser } = useAuth();
 
   // --- States for targets, modals, data etc. ---
-  const NUTRITION_TARGET_KEY = 'dailyNutritionTarget';
+  const userUid = currentUser?.uid || currentUser?._id || 'guest';
+  const NUTRITION_TARGET_KEY = `dailyNutritionTarget_${userUid}`;
   const [dailyTarget, setDailyTarget] = useState<NutritionData>(() => {
     try {
       const savedTarget = localStorage.getItem(NUTRITION_TARGET_KEY);
-      return savedTarget ? JSON.parse(savedTarget) : { calories: 2200, protein: 130, carbs: 240, fat: 70 };
+      return savedTarget ? JSON.parse(savedTarget) : { calories: 2000, protein: 120, carbs: 220, fat: 65 };
     } catch (error) {
-      console.error("Failed to parse nutrition target from localStorage", error);
-      return { calories: 2200, protein: 130, carbs: 240, fat: 70 };
+      return { calories: 2000, protein: 120, carbs: 220, fat: 65 };
     }
   });
+
   useEffect(() => {
-    localStorage.setItem(NUTRITION_TARGET_KEY, JSON.stringify(dailyTarget));
-  }, [dailyTarget]);
+    try {
+      const savedTarget = localStorage.getItem(NUTRITION_TARGET_KEY);
+      if (savedTarget) {
+        setDailyTarget(JSON.parse(savedTarget));
+      } else {
+        setDailyTarget({ calories: 2000, protein: 120, carbs: 220, fat: 65 });
+      }
+    } catch {
+      setDailyTarget({ calories: 2000, protein: 120, carbs: 220, fat: 65 });
+    }
+  }, [NUTRITION_TARGET_KEY]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(NUTRITION_TARGET_KEY, JSON.stringify(dailyTarget));
+    } catch (e) {
+      console.warn("Could not save daily target", e);
+    }
+  }, [dailyTarget, NUTRITION_TARGET_KEY]);
 
   const handleTargetChange = (newCalories: number) => {
     setDailyTarget(currentTarget => ({ ...currentTarget, calories: newCalories }));

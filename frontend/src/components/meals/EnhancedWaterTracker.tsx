@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { Droplets, Plus, Minus, Clock, RotateCcw } from 'lucide-react';
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface EnhancedWaterTrackerProps {
   className?: string;
@@ -13,27 +14,63 @@ interface EnhancedWaterTrackerProps {
 
 export function EnhancedWaterTracker({ className }: EnhancedWaterTrackerProps) {
   const { toast } = useToast();
+  const { currentUser } = useAuth();
+  const userId = currentUser?._id || currentUser?.uid || 'guest';
+  const todayKey = new Date().toISOString().split('T')[0];
+  const storageKey = `waterIntake_${userId}_${todayKey}`;
+  const remindersKey = `waterReminders_${userId}`;
+
   const [waterIntake, setWaterIntake] = useState(() => {
-    // Load from localStorage or default to 0
-    const saved = localStorage.getItem('waterIntake');
-    return saved ? parseInt(saved) : 0;
+    try {
+      const saved = localStorage.getItem(storageKey);
+      return saved ? parseInt(saved, 10) : 0;
+    } catch {
+      return 0;
+    }
   });
+
   const [remindersEnabled, setRemindersEnabled] = useState(() => {
-    const saved = localStorage.getItem('waterReminders');
-    return saved === 'true';
+    try {
+      const saved = localStorage.getItem(remindersKey);
+      return saved === 'true';
+    } catch {
+      return false;
+    }
   });
+
   const [customAmount, setCustomAmount] = useState('');
   const target = 2000; // 2L daily target
 
+  // Re-sync if user changes
+  useEffect(() => {
+    try {
+      const savedIntake = localStorage.getItem(storageKey);
+      setWaterIntake(savedIntake ? parseInt(savedIntake, 10) : 0);
+      const savedReminders = localStorage.getItem(remindersKey);
+      setRemindersEnabled(savedReminders === 'true');
+    } catch {
+      setWaterIntake(0);
+      setRemindersEnabled(false);
+    }
+  }, [storageKey, remindersKey]);
+
   // Save to localStorage whenever water intake changes
   useEffect(() => {
-    localStorage.setItem('waterIntake', waterIntake.toString());
-  }, [waterIntake]);
+    try {
+      localStorage.setItem(storageKey, waterIntake.toString());
+    } catch (e) {
+      console.warn("Could not save water intake", e);
+    }
+  }, [waterIntake, storageKey]);
 
   // Save reminders setting
   useEffect(() => {
-    localStorage.setItem('waterReminders', remindersEnabled.toString());
-  }, [remindersEnabled]);
+    try {
+      localStorage.setItem(remindersKey, remindersEnabled.toString());
+    } catch (e) {
+      console.warn("Could not save reminders setting", e);
+    }
+  }, [remindersEnabled, remindersKey]);
 
   // Daily reset at midnight
   useEffect(() => {

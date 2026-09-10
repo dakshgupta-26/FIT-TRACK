@@ -67,12 +67,12 @@ export const Profile: React.FC = () => {
     firstName: '',
     lastName: '',
     email: '',
-    height: '182',
-    weight: '75',
+    height: '',
+    weight: '',
     birthDate: '',
     gender: 'Male',
-    fitnessGoal: 'Hypertrophy & Shred',
-    activityLevel: 'High Activity',
+    fitnessGoal: 'General Health & Fitness',
+    activityLevel: 'Active',
   });
 
   const [isSaving, setIsSaving] = useState(false);
@@ -84,12 +84,12 @@ export const Profile: React.FC = () => {
       loadUserProfileImage();
       setForm((prev) => ({
         ...prev,
-        firstName: currentUser.firstName || 'Athlete',
+        firstName: currentUser.firstName || '',
         lastName: currentUser.lastName || '',
         email: currentUser.email || '',
         birthDate: currentUser.birthDate ? currentUser.birthDate.split('T')[0] : '',
-        height: currentUser.height || prev.height,
-        weight: currentUser.weight || prev.weight,
+        height: currentUser.height || '',
+        weight: currentUser.weight || '',
       }));
     }
   }, [currentUser, loadUserProfileImage]);
@@ -244,7 +244,9 @@ export const Profile: React.FC = () => {
               <div className="space-y-3">
                 <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
                   <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
-                    {form.firstName || 'Daksh'} {form.lastName || 'Gupta'}
+                    {(form.firstName || currentUser?.firstName)
+                      ? `${form.firstName || currentUser?.firstName} ${form.lastName || currentUser?.lastName || ''}`.trim()
+                      : currentUser?.email?.split('@')[0] || 'Athlete'}
                   </h1>
                   <span className="px-2.5 py-0.5 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/30 text-[10px] font-mono font-bold flex items-center gap-1">
                     <ShieldCheck className="w-3.5 h-3.5 text-teal-400" /> VERIFIED AI ATHLETE
@@ -252,15 +254,12 @@ export const Profile: React.FC = () => {
                 </div>
 
                 <p className="text-xs font-mono text-slate-400">
-                  {form.email || 'user@fittrack.ai'} • Member since Jan 2025
+                  {form.email || currentUser?.email || 'user@fittrack.ai'} • FitTrack Member
                 </p>
 
                 <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
-                  <span className="px-3 py-1 rounded-xl bg-slate-950/80 border border-white/10 text-xs font-bold text-orange-400 flex items-center gap-1.5">
-                    <Flame className="w-3.5 h-3.5 fill-orange-400" /> 18-Day Streak
-                  </span>
                   <span className="px-3 py-1 rounded-xl bg-slate-950/80 border border-white/10 text-xs font-bold text-teal-300 flex items-center gap-1.5">
-                    <Zap className="w-3.5 h-3.5 text-teal-400 fill-teal-400" /> Level 14 AI Pro
+                    <Shield className="w-3.5 h-3.5 text-teal-400" /> Member Account
                   </span>
                 </div>
               </div>
@@ -312,12 +311,12 @@ export const Profile: React.FC = () => {
           {/* FLOATING PARALLAX MINI-WIDGETS */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mt-8 pt-6 border-t border-white/10">
             {[
-              { label: 'Resting HR', val: '58 bpm', sub: 'Low stress avg', icon: Heart, color: 'text-rose-400' },
-              { label: 'Active Cal', val: '2,840 kcal', sub: '+14% target', icon: Flame, color: 'text-orange-400' },
-              { label: 'VO₂ Max', val: '48.5', sub: 'Superior status', icon: Zap, color: 'text-teal-400' },
-              { label: 'Hydration', val: '3.2 Liters', sub: 'Target reached', icon: Droplet, color: 'text-cyan-400' },
-              { label: 'Recovery', val: '95%', sub: 'PR Attempt Ready', icon: Activity, color: 'text-emerald-400' },
-              { label: 'Sleep Score', val: '92 / 100', sub: '7h 45m deep', icon: Moon, color: 'text-indigo-400' },
+              { label: 'Weight', val: form.weight ? `${form.weight} kg` : 'Not recorded', sub: 'Body metric', icon: Scale, color: 'text-teal-400' },
+              { label: 'Height', val: form.height ? `${form.height} cm` : 'Not recorded', sub: 'Body metric', icon: Target, color: 'text-cyan-400' },
+              { label: 'Daily Water', val: '2.0 Liters', sub: 'Target volume', icon: Droplet, color: 'text-blue-400' },
+              { label: 'Activity Level', val: form.activityLevel || 'Active', sub: 'Selected pace', icon: Activity, color: 'text-emerald-400' },
+              { label: 'Primary Goal', val: form.fitnessGoal || 'Fitness', sub: 'Active priority', icon: Sparkles, color: 'text-indigo-400' },
+              { label: 'Account', val: 'Verified', sub: 'Cloud active', icon: ShieldCheck, color: 'text-teal-300' },
             ].map((widget) => (
               <motion.div
                 key={widget.label}
@@ -556,8 +555,9 @@ export const Profile: React.FC = () => {
                   <input
                     type="number"
                     value={form.height}
+                    placeholder="e.g. 175"
                     onChange={(e) => setForm({ ...form, height: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-white"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-white placeholder:text-slate-600"
                   />
                 </div>
 
@@ -566,8 +566,9 @@ export const Profile: React.FC = () => {
                   <input
                     type="number"
                     value={form.weight}
+                    placeholder="e.g. 70"
                     onChange={(e) => setForm({ ...form, weight: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-white"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-white placeholder:text-slate-600"
                   />
                 </div>
               </div>

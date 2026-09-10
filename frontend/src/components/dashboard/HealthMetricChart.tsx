@@ -3,6 +3,7 @@ import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { Activity } from 'lucide-react';
 
 interface DataPoint {
   date: string;
@@ -23,11 +24,13 @@ export function HealthMetricChart({
   title, 
   description, 
   data, 
-  dataKey = "value",
+  dataKey = "value", 
   strokeColor = "hsl(var(--primary))",
   className,
   yAxisLabel
 }: HealthMetricChartProps) {
+  const hasData = data && data.length > 0 && data.some(d => d.value > 0);
+
   return (
     <Card className={cn("h-full", className)}>
       <CardHeader className="pb-2">
@@ -35,7 +38,18 @@ export function HealthMetricChart({
         {description && <CardDescription>{description}</CardDescription>}
       </CardHeader>
       <CardContent className="p-1 pt-4">
-        <ResponsiveContainer width="100%" height={250}>
+        {!hasData ? (
+          <div className="h-[250px] flex flex-col items-center justify-center text-center p-6 space-y-2">
+            <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+              <Activity className="w-6 h-6 opacity-60" />
+            </div>
+            <p className="text-sm font-medium text-foreground">No {title.toLowerCase()} recorded yet</p>
+            <p className="text-xs text-muted-foreground max-w-xs">
+              Log your health metrics to view your progress trends over time.
+            </p>
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height={250}>
           <LineChart data={data} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted))" opacity={0.3} />
             <XAxis 
@@ -94,6 +108,7 @@ export function HealthMetricChart({
             />
           </LineChart>
         </ResponsiveContainer>
+        )}
       </CardContent>
     </Card>
   );

@@ -1,10 +1,9 @@
-
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Heart, Activity, Clock, Weight } from 'lucide-react';
+import { Plus, Heart, Activity, Clock, Weight, Moon } from 'lucide-react';
 import { 
   LineChart, 
   Line, 
@@ -19,47 +18,6 @@ import {
 import AddMeasurementModal from '@/components/modals/AddMeasurementModal';
 import { useHealthMetrics } from '@/hooks/useHealthMetrics';
 
-// Fallback sample data for when no real data is available
-const fallbackWeightData = [
-  { date: 'Mar 5', value: 76.2 },
-  { date: 'Mar 12', value: 75.8 },
-  { date: 'Mar 19', value: 75.1 },
-  { date: 'Mar 26', value: 74.9 },
-  { date: 'Apr 2', value: 74.5 },
-  { date: 'Apr 9', value: 74.2 },
-  { date: 'Apr 16', value: 73.8 },
-];
-
-const fallbackHeartRateData = [
-  { date: '04/01', resting: 68, active: 132 },
-  { date: '04/02', resting: 67, active: 145 },
-  { date: '04/03', resting: 69, active: 139 },
-  { date: '04/04', resting: 70, active: 128 },
-  { date: '04/05', resting: 66, active: 142 },
-  { date: '04/06', resting: 67, active: 138 },
-  { date: '04/07', resting: 65, active: 140 },
-];
-
-const fallbackSleepData = [
-  { date: '04/01', hours: 7.2, deep: 2.1, light: 4.0, rem: 1.1 },
-  { date: '04/02', hours: 7.5, deep: 2.3, light: 3.9, rem: 1.3 },
-  { date: '04/03', hours: 6.8, deep: 1.9, light: 3.8, rem: 1.1 },
-  { date: '04/04', hours: 7.8, deep: 2.5, light: 4.1, rem: 1.2 },
-  { date: '04/05', hours: 7.1, deep: 2.0, light: 3.9, rem: 1.2 },
-  { date: '04/06', hours: 6.9, deep: 1.8, light: 4.0, rem: 1.1 },
-  { date: '04/07', hours: 7.6, deep: 2.4, light: 4.0, rem: 1.2 },
-];
-
-const fallbackBloodPressureData = [
-  { date: '04/01', systolic: 122, diastolic: 78 },
-  { date: '04/02', systolic: 120, diastolic: 76 },
-  { date: '04/03', systolic: 124, diastolic: 79 },
-  { date: '04/04', systolic: 118, diastolic: 75 },
-  { date: '04/05', systolic: 121, diastolic: 77 },
-  { date: '04/06', systolic: 120, diastolic: 76 },
-  { date: '04/07', systolic: 119, diastolic: 74 },
-];
-
 const Metrics = () => {
   const { toast } = useToast();
   const { 
@@ -73,74 +31,73 @@ const Metrics = () => {
     fetchSummary 
   } = useHealthMetrics();
 
-  // Transform real data for charts with fallback
-  const weightData = getMetricsByType('weight').length > 0 
-    ? getMetricsByType('weight').map(metric => ({
-        date: new Date(metric.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        value: metric.value
-      })).reverse()
-    : fallbackWeightData;
+  const weightMetrics = getMetricsByType('weight');
+  const restingHrMetrics = getMetricsByType('heart_rate_resting');
+  const activeHrMetrics = getMetricsByType('heart_rate_active');
+  const sleepMetrics = getMetricsByType('sleep_hours');
+  const bpSystolicMetrics = getMetricsByType('blood_pressure_systolic');
+  const bpDiastolicMetrics = getMetricsByType('blood_pressure_diastolic');
 
-  const heartRateData = getMetricsByType('heart_rate_resting').length > 0
-    ? getMetricsByType('heart_rate_resting').map(metric => ({
-        date: new Date(metric.date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' }),
-        resting: metric.value,
-        active: getMetricsByType('heart_rate_active').find(m => 
-          new Date(m.date).toDateString() === new Date(metric.date).toDateString()
-        )?.value || 0
-      })).reverse()
-    : fallbackHeartRateData;
+  // Transform real user data for charts
+  const weightData = weightMetrics.map(metric => ({
+    date: new Date(metric.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    value: metric.value
+  })).reverse();
 
-  const sleepData = getMetricsByType('sleep_hours').length > 0
-    ? getMetricsByType('sleep_hours').map(metric => ({
-        date: new Date(metric.date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' }),
-        hours: metric.value,
-        deep: getMetricsByType('sleep_deep').find(m => 
-          new Date(m.date).toDateString() === new Date(metric.date).toDateString()
-        )?.value || 0,
-        light: getMetricsByType('sleep_light').find(m => 
-          new Date(m.date).toDateString() === new Date(metric.date).toDateString()
-        )?.value || 0,
-        rem: getMetricsByType('sleep_rem').find(m => 
-          new Date(m.date).toDateString() === new Date(metric.date).toDateString()
-        )?.value || 0
-      })).reverse()
-    : fallbackSleepData;
+  const heartRateData = restingHrMetrics.map(metric => ({
+    date: new Date(metric.date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' }),
+    resting: metric.value,
+    active: activeHrMetrics.find(m => 
+      new Date(m.date).toDateString() === new Date(metric.date).toDateString()
+    )?.value || 0
+  })).reverse();
 
-  const bloodPressureData = getMetricsByType('blood_pressure_systolic').length > 0
-    ? getMetricsByType('blood_pressure_systolic').map(metric => ({
-        date: new Date(metric.date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' }),
-        systolic: metric.value,
-        diastolic: getMetricsByType('blood_pressure_diastolic').find(m => 
-          new Date(m.date).toDateString() === new Date(metric.date).toDateString()
-        )?.value || 0
-      })).reverse()
-    : fallbackBloodPressureData;
+  const sleepData = sleepMetrics.map(metric => ({
+    date: new Date(metric.date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' }),
+    hours: metric.value,
+    deep: getMetricsByType('sleep_deep').find(m => 
+      new Date(m.date).toDateString() === new Date(metric.date).toDateString()
+    )?.value || 0,
+    light: getMetricsByType('sleep_light').find(m => 
+      new Date(m.date).toDateString() === new Date(metric.date).toDateString()
+    )?.value || 0,
+    rem: getMetricsByType('sleep_rem').find(m => 
+      new Date(m.date).toDateString() === new Date(metric.date).toDateString()
+    )?.value || 0
+  })).reverse();
 
-  // Create recent measurements from real data
+  const bloodPressureData = bpSystolicMetrics.map(metric => ({
+    date: new Date(metric.date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' }),
+    systolic: metric.value,
+    diastolic: bpDiastolicMetrics.find(m => 
+      new Date(m.date).toDateString() === new Date(metric.date).toDateString()
+    )?.value || 0
+  })).reverse();
+
+  // Create recent measurements from real user data
   const recentMeasurements = [
     { 
       name: 'Weight', 
       value: getLatestMetric('weight') ? `${getLatestMetric('weight')?.value} ${getLatestMetric('weight')?.unit}` : 'No data', 
-      date: getLatestMetric('weight') ? new Date(getLatestMetric('weight')?.date || '').toLocaleDateString() : 'No data', 
+      date: getLatestMetric('weight') ? new Date(getLatestMetric('weight')?.date || '').toLocaleDateString() : 'Not recorded', 
       icon: Weight 
     },
     { 
       name: 'BMI', 
       value: getLatestMetric('bmi') ? getLatestMetric('bmi')?.value.toString() : 'No data', 
-      date: getLatestMetric('bmi') ? new Date(getLatestMetric('bmi')?.date || '').toLocaleDateString() : 'No data', 
+      date: getLatestMetric('bmi') ? new Date(getLatestMetric('bmi')?.date || '').toLocaleDateString() : 'Not recorded', 
       icon: Activity 
     },
     { 
       name: 'Body Fat', 
       value: getLatestMetric('body_fat') ? `${getLatestMetric('body_fat')?.value}${getLatestMetric('body_fat')?.unit}` : 'No data', 
-      date: getLatestMetric('body_fat') ? new Date(getLatestMetric('body_fat')?.date || '').toLocaleDateString() : 'No data', 
+      date: getLatestMetric('body_fat') ? new Date(getLatestMetric('body_fat')?.date || '').toLocaleDateString() : 'Not recorded', 
       icon: Weight 
     },
     { 
       name: 'Resting Heart Rate', 
       value: getLatestMetric('heart_rate_resting') ? `${getLatestMetric('heart_rate_resting')?.value} ${getLatestMetric('heart_rate_resting')?.unit}` : 'No data', 
-      date: getLatestMetric('heart_rate_resting') ? new Date(getLatestMetric('heart_rate_resting')?.date || '').toLocaleDateString() : 'No data', 
+      date: getLatestMetric('heart_rate_resting') ? new Date(getLatestMetric('heart_rate_resting')?.date || '').toLocaleDateString() : 'Not recorded', 
       icon: Heart 
     },
     { 
@@ -148,13 +105,13 @@ const Metrics = () => {
       value: getLatestMetric('blood_pressure_systolic') && getLatestMetric('blood_pressure_diastolic') 
         ? `${getLatestMetric('blood_pressure_systolic')?.value}/${getLatestMetric('blood_pressure_diastolic')?.value}` 
         : 'No data', 
-      date: getLatestMetric('blood_pressure_systolic') ? new Date(getLatestMetric('blood_pressure_systolic')?.date || '').toLocaleDateString() : 'No data', 
+      date: getLatestMetric('blood_pressure_systolic') ? new Date(getLatestMetric('blood_pressure_systolic')?.date || '').toLocaleDateString() : 'Not recorded', 
       icon: Activity 
     },
     { 
       name: 'Avg. Sleep', 
       value: getLatestMetric('sleep_hours') ? `${getLatestMetric('sleep_hours')?.value} hrs` : 'No data', 
-      date: getLatestMetric('sleep_hours') ? new Date(getLatestMetric('sleep_hours')?.date || '').toLocaleDateString() : 'No data', 
+      date: getLatestMetric('sleep_hours') ? new Date(getLatestMetric('sleep_hours')?.date || '').toLocaleDateString() : 'Not recorded', 
       icon: Clock 
     },
   ];
@@ -164,12 +121,29 @@ const Metrics = () => {
     fetchSummary();
   };
 
+  const renderEmptyTab = (metricTitle: string, description: string, Icon: React.ElementType) => (
+    <div className="h-72 flex flex-col items-center justify-center text-center p-8 space-y-3 bg-card/40 rounded-2xl border border-dashed border-border/60">
+      <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+        <Icon className="w-7 h-7 opacity-75" />
+      </div>
+      <div>
+        <h3 className="font-semibold text-base text-foreground">No {metricTitle.toLowerCase()} data recorded</h3>
+        <p className="text-xs text-muted-foreground max-w-sm mt-1">
+          {description}
+        </p>
+      </div>
+      <div className="pt-2">
+        <AddMeasurementModal onMeasurementAdded={handleMeasurementAdded} />
+      </div>
+    </div>
+  );
+
   return (
     <div className="p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6 md:space-y-8 max-w-7xl mx-auto w-full">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold">Health Metrics</h1>
-          <p className="text-xs sm:text-sm text-muted-foreground">Track and monitor your health indicators</p>
+          <p className="text-xs sm:text-sm text-muted-foreground">Track and monitor your personal health indicators</p>
         </div>
         <AddMeasurementModal onMeasurementAdded={handleMeasurementAdded} />
       </div>
@@ -205,107 +179,103 @@ const Metrics = () => {
           </TabsList>
         </div>
         
+        {/* WEIGHT TAB */}
         <TabsContent value="weight" className="mt-0">
           <Card>
             <CardHeader>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                   <CardTitle className="text-lg sm:text-xl">Weight Tracking</CardTitle>
-                  <CardDescription className="text-xs sm:text-sm">Your progress over time</CardDescription>
-                </div>
-                <div className="flex flex-wrap gap-1.5 sm:gap-2 text-xs sm:text-sm">
-                  <Button variant="outline" size="sm" className="h-8 px-2.5 sm:px-3 text-xs">1M</Button>
-                  <Button variant="outline" size="sm" className="h-8 px-2.5 sm:px-3 text-xs bg-primary/5">3M</Button>
-                  <Button variant="outline" size="sm" className="h-8 px-2.5 sm:px-3 text-xs">6M</Button>
-                  <Button variant="outline" size="sm" className="h-8 px-2.5 sm:px-3 text-xs">1Y</Button>
+                  <CardDescription className="text-xs sm:text-sm">Your weight progress over time</CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={weightData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="colorWeight" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" opacity={0.3} />
-                    <XAxis 
-                      dataKey="date" 
-                      stroke="hsl(var(--muted-foreground))" 
-                      fontSize={12}
-                      tickLine={false}
-                      axisLine={false}
-                    />
-                    <YAxis 
-                      domain={['dataMin - 1', 'dataMax + 1']}
-                      stroke="hsl(var(--muted-foreground))" 
-                      fontSize={12}
-                      tickLine={false}
-                      axisLine={false}
-                      label={{ 
-                        value: 'kg', 
-                        angle: -90, 
-                        position: 'insideLeft', 
-                        style: { textAnchor: 'middle', fill: 'hsl(var(--muted-foreground))' } 
-                      }}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: 'hsl(var(--card))',
-                        borderColor: 'hsl(var(--border))',
-                        borderRadius: 'var(--radius)',
-                        color: 'hsl(var(--card-foreground))'
-                      }}
-                    />
-                    <Area 
-                      type="monotone" 
-                      dataKey="value" 
-                      stroke="hsl(var(--primary))" 
-                      fillOpacity={1}
-                      fill="url(#colorWeight)"
-                      strokeWidth={2}
-                      activeDot={{ r: 6 }}
-                      dot={{ r: 3, strokeWidth: 2 }}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="mt-4 grid grid-cols-3 gap-4 text-center">
-                <div className="p-3 bg-muted/30 rounded-lg">
-                  <p className="text-sm text-muted-foreground">Starting</p>
-                  <p className="text-lg font-bold">
-                    {getMetricsByType('weight').length > 0 
-                      ? `${getMetricsByType('weight')[getMetricsByType('weight').length - 1]?.value} ${getMetricsByType('weight')[getMetricsByType('weight').length - 1]?.unit}`
-                      : '76.2 kg'
-                    }
-                  </p>
-                </div>
-                <div className="p-3 bg-muted/30 rounded-lg">
-                  <p className="text-sm text-muted-foreground">Current</p>
-                  <p className="text-lg font-bold">
-                    {getLatestMetric('weight') 
-                      ? `${getLatestMetric('weight')?.value} ${getLatestMetric('weight')?.unit}`
-                      : '73.8 kg'
-                    }
-                  </p>
-                </div>
-                <div className="p-3 bg-muted/30 rounded-lg">
-                  <p className="text-sm text-muted-foreground">Change</p>
-                  <p className="text-lg font-bold text-green-500">
-                    {getMetricsByType('weight').length > 1 
-                      ? `${(getLatestMetric('weight')?.value || 0) - (getMetricsByType('weight')[getMetricsByType('weight').length - 1]?.value || 0)} kg`
-                      : '-2.4 kg'
-                    }
-                  </p>
-                </div>
-              </div>
+              {weightData.length === 0 ? (
+                renderEmptyTab("Weight", "Log your body weight periodically to visualize changes and monitor trends.", Weight)
+              ) : (
+                <>
+                  <div className="h-80">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={weightData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                        <defs>
+                          <linearGradient id="colorWeight" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" opacity={0.3} />
+                        <XAxis 
+                          dataKey="date" 
+                          stroke="hsl(var(--muted-foreground))" 
+                          fontSize={12}
+                          tickLine={false}
+                          axisLine={false}
+                        />
+                        <YAxis 
+                          domain={['dataMin - 1', 'dataMax + 1']}
+                          stroke="hsl(var(--muted-foreground))" 
+                          fontSize={12}
+                          tickLine={false}
+                          axisLine={false}
+                          label={{ 
+                            value: 'kg', 
+                            angle: -90, 
+                            position: 'insideLeft', 
+                            style: { textAnchor: 'middle', fill: 'hsl(var(--muted-foreground))' } 
+                          }}
+                        />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: 'hsl(var(--card))',
+                            borderColor: 'hsl(var(--border))',
+                            borderRadius: 'var(--radius)',
+                            color: 'hsl(var(--card-foreground))'
+                          }}
+                        />
+                        <Area 
+                          type="monotone" 
+                          dataKey="value" 
+                          stroke="hsl(var(--primary))" 
+                          fillOpacity={1}
+                          fill="url(#colorWeight)"
+                          strokeWidth={2}
+                          activeDot={{ r: 6 }}
+                          dot={{ r: 3, strokeWidth: 2 }}
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="mt-4 grid grid-cols-3 gap-4 text-center">
+                    <div className="p-3 bg-muted/30 rounded-lg">
+                      <p className="text-sm text-muted-foreground">Starting</p>
+                      <p className="text-lg font-bold">
+                        {`${weightMetrics[weightMetrics.length - 1]?.value} ${weightMetrics[weightMetrics.length - 1]?.unit}`}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-muted/30 rounded-lg">
+                      <p className="text-sm text-muted-foreground">Current</p>
+                      <p className="text-lg font-bold">
+                        {`${getLatestMetric('weight')?.value} ${getLatestMetric('weight')?.unit}`}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-muted/30 rounded-lg">
+                      <p className="text-sm text-muted-foreground">Change</p>
+                      <p className="text-lg font-bold text-teal-400">
+                        {weightMetrics.length > 1 
+                          ? `${((getLatestMetric('weight')?.value || 0) - (weightMetrics[weightMetrics.length - 1]?.value || 0)).toFixed(1)} kg`
+                          : '0 kg'
+                        }
+                      </p>
+                    </div>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
         
+        {/* HEART RATE TAB */}
         <TabsContent value="heart-rate" className="mt-0">
           <Card>
             <CardHeader>
@@ -314,236 +284,240 @@ const Metrics = () => {
                   <CardTitle>Heart Rate</CardTitle>
                   <CardDescription>Resting and active heart rate</CardDescription>
                 </div>
-                <div className="flex gap-2 text-sm">
-                  <Button variant="outline" size="sm">1W</Button>
-                  <Button variant="outline" size="sm" className="bg-primary/5">1M</Button>
-                  <Button variant="outline" size="sm">3M</Button>
-                </div>
               </div>
             </CardHeader>
             <CardContent>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={heartRateData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" opacity={0.3} />
-                    <XAxis 
-                      dataKey="date" 
-                      stroke="hsl(var(--muted-foreground))" 
-                      fontSize={12}
-                      tickLine={false}
-                      axisLine={false}
-                    />
-                    <YAxis 
-                      stroke="hsl(var(--muted-foreground))" 
-                      fontSize={12}
-                      tickLine={false}
-                      axisLine={false}
-                      label={{ 
-                        value: 'bpm', 
-                        angle: -90, 
-                        position: 'insideLeft', 
-                        style: { textAnchor: 'middle', fill: 'hsl(var(--muted-foreground))' } 
-                      }}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: 'hsl(var(--card))',
-                        borderColor: 'hsl(var(--border))',
-                        borderRadius: 'var(--radius)',
-                        color: 'hsl(var(--card-foreground))'
-                      }}
-                    />
-                    <Line 
-                      type="monotone" 
-                      name="Resting"
-                      dataKey="resting" 
-                      stroke="hsl(var(--primary))" 
-                      strokeWidth={2}
-                      activeDot={{ r: 6 }}
-                      dot={{ r: 3, fill: 'hsl(var(--background))', strokeWidth: 2 }}
-                    />
-                    <Line 
-                      type="monotone" 
-                      name="Active"
-                      dataKey="active" 
-                      stroke="hsl(var(--accent))" 
-                      strokeWidth={2}
-                      activeDot={{ r: 6 }}
-                      dot={{ r: 3, fill: 'hsl(var(--background))', strokeWidth: 2 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="mt-4 grid grid-cols-2 gap-4 text-center">
-                <div className="p-3 bg-muted/30 rounded-lg">
-                  <p className="text-sm text-muted-foreground">Avg. Resting</p>
-                  <div className="flex items-center justify-center gap-2">
-                    <Heart className="h-5 w-5 text-primary" />
-                    <p className="text-lg font-bold">
-                      {getLatestMetric('heart_rate_resting') 
-                        ? `${getLatestMetric('heart_rate_resting')?.value} bpm`
-                        : '67 bpm'
-                      }
-                    </p>
+              {heartRateData.length === 0 ? (
+                renderEmptyTab("Heart Rate", "Record your resting or active heart rate in bpm to monitor cardiovascular performance.", Heart)
+              ) : (
+                <>
+                  <div className="h-80">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={heartRateData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" opacity={0.3} />
+                        <XAxis 
+                          dataKey="date" 
+                          stroke="hsl(var(--muted-foreground))" 
+                          fontSize={12}
+                          tickLine={false}
+                          axisLine={false}
+                        />
+                        <YAxis 
+                          stroke="hsl(var(--muted-foreground))" 
+                          fontSize={12}
+                          tickLine={false}
+                          axisLine={false}
+                          label={{ 
+                            value: 'bpm', 
+                            angle: -90, 
+                            position: 'insideLeft', 
+                            style: { textAnchor: 'middle', fill: 'hsl(var(--muted-foreground))' } 
+                          }}
+                        />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: 'hsl(var(--card))',
+                            borderColor: 'hsl(var(--border))',
+                            borderRadius: 'var(--radius)',
+                            color: 'hsl(var(--card-foreground))'
+                          }}
+                        />
+                        <Line 
+                          type="monotone" 
+                          name="Resting"
+                          dataKey="resting" 
+                          stroke="hsl(var(--primary))" 
+                          strokeWidth={2}
+                          activeDot={{ r: 6 }}
+                          dot={{ r: 3, fill: 'hsl(var(--background))', strokeWidth: 2 }}
+                        />
+                        <Line 
+                          type="monotone" 
+                          name="Active"
+                          dataKey="active" 
+                          stroke="hsl(var(--accent))" 
+                          strokeWidth={2}
+                          activeDot={{ r: 6 }}
+                          dot={{ r: 3, fill: 'hsl(var(--background))', strokeWidth: 2 }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
                   </div>
-                </div>
-                <div className="p-3 bg-muted/30 rounded-lg">
-                  <p className="text-sm text-muted-foreground">Avg. Active</p>
-                  <div className="flex items-center justify-center gap-2">
-                    <Activity className="h-5 w-5 text-accent" />
-                    <p className="text-lg font-bold">
-                      {getLatestMetric('heart_rate_active') 
-                        ? `${getLatestMetric('heart_rate_active')?.value} bpm`
-                        : '138 bpm'
-                      }
-                    </p>
+                  <div className="mt-4 grid grid-cols-2 gap-4 text-center">
+                    <div className="p-3 bg-muted/30 rounded-lg">
+                      <p className="text-sm text-muted-foreground">Latest Resting</p>
+                      <div className="flex items-center justify-center gap-2">
+                        <Heart className="h-5 w-5 text-primary" />
+                        <p className="text-lg font-bold">
+                          {getLatestMetric('heart_rate_resting') 
+                            ? `${getLatestMetric('heart_rate_resting')?.value} bpm`
+                            : '-- bpm'
+                          }
+                        </p>
+                      </div>
+                    </div>
+                    <div className="p-3 bg-muted/30 rounded-lg">
+                      <p className="text-sm text-muted-foreground">Latest Active</p>
+                      <div className="flex items-center justify-center gap-2">
+                        <Activity className="h-5 w-5 text-accent" />
+                        <p className="text-lg font-bold">
+                          {getLatestMetric('heart_rate_active') 
+                            ? `${getLatestMetric('heart_rate_active')?.value} bpm`
+                            : '-- bpm'
+                          }
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
+                </>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
         
+        {/* SLEEP TAB */}
         <TabsContent value="sleep" className="mt-0">
           <Card>
             <CardHeader>
               <div className="flex justify-between items-center">
                 <div>
                   <CardTitle>Sleep Tracking</CardTitle>
-                  <CardDescription>Your sleep duration and quality</CardDescription>
-                </div>
-                <div className="flex gap-2 text-sm">
-                  <Button variant="outline" size="sm">1W</Button>
-                  <Button variant="outline" size="sm" className="bg-primary/5">2W</Button>
-                  <Button variant="outline" size="sm">1M</Button>
+                  <CardDescription>Your sleep duration and stages</CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={sleepData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="colorDeep" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4}/>
-                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-                      </linearGradient>
-                      <linearGradient id="colorLight" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#93c5fd" stopOpacity={0.4}/>
-                        <stop offset="95%" stopColor="#93c5fd" stopOpacity={0}/>
-                      </linearGradient>
-                      <linearGradient id="colorRem" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#818cf8" stopOpacity={0.4}/>
-                        <stop offset="95%" stopColor="#818cf8" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" opacity={0.3} />
-                    <XAxis 
-                      dataKey="date" 
-                      stroke="hsl(var(--muted-foreground))" 
-                      fontSize={12}
-                      tickLine={false}
-                      axisLine={false}
-                    />
-                    <YAxis 
-                      stroke="hsl(var(--muted-foreground))" 
-                      fontSize={12}
-                      tickLine={false}
-                      axisLine={false}
-                      label={{ 
-                        value: 'hours', 
-                        angle: -90, 
-                        position: 'insideLeft', 
-                        style: { textAnchor: 'middle', fill: 'hsl(var(--muted-foreground))' } 
-                      }}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: 'hsl(var(--card))',
-                        borderColor: 'hsl(var(--border))',
-                        borderRadius: 'var(--radius)',
-                        color: 'hsl(var(--card-foreground))'
-                      }}
-                    />
-                    <Area 
-                      type="monotone" 
-                      name="Total Sleep"
-                      dataKey="hours" 
-                      stroke="hsl(var(--primary))" 
-                      fill="none"
-                      strokeWidth={2}
-                      activeDot={{ r: 6 }}
-                      dot={{ r: 3, strokeWidth: 2 }}
-                    />
-                    <Area 
-                      type="monotone"
-                      name="Deep Sleep" 
-                      dataKey="deep" 
-                      stackId="1"
-                      stroke="#3b82f6" 
-                      fill="url(#colorDeep)"
-                    />
-                    <Area 
-                      type="monotone" 
-                      name="Light Sleep"
-                      dataKey="light" 
-                      stackId="1"
-                      stroke="#93c5fd" 
-                      fill="url(#colorLight)"
-                    />
-                    <Area 
-                      type="monotone" 
-                      name="REM Sleep"
-                      dataKey="rem" 
-                      stackId="1"
-                      stroke="#818cf8" 
-                      fill="url(#colorRem)"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="mt-4 grid grid-cols-4 gap-4 text-center">
-                <div className="p-3 bg-muted/30 rounded-lg">
-                  <p className="text-sm text-muted-foreground">Avg. Total</p>
-                  <p className="text-lg font-bold">
-                    {getLatestMetric('sleep_hours') 
-                      ? `${getLatestMetric('sleep_hours')?.value} hrs`
-                      : '7.3 hrs'
-                    }
-                  </p>
-                </div>
-                <div className="p-3 bg-muted/30 rounded-lg">
-                  <p className="text-sm text-muted-foreground">Deep</p>
-                  <p className="text-lg font-bold text-blue-500">
-                    {getLatestMetric('sleep_deep') 
-                      ? `${getLatestMetric('sleep_deep')?.value} hrs`
-                      : '2.1 hrs'
-                    }
-                  </p>
-                </div>
-                <div className="p-3 bg-muted/30 rounded-lg">
-                  <p className="text-sm text-muted-foreground">Light</p>
-                  <p className="text-lg font-bold text-blue-300">
-                    {getLatestMetric('sleep_light') 
-                      ? `${getLatestMetric('sleep_light')?.value} hrs`
-                      : '4.0 hrs'
-                    }
-                  </p>
-                </div>
-                <div className="p-3 bg-muted/30 rounded-lg">
-                  <p className="text-sm text-muted-foreground">REM</p>
-                  <p className="text-lg font-bold text-indigo-400">
-                    {getLatestMetric('sleep_rem') 
-                      ? `${getLatestMetric('sleep_rem')?.value} hrs`
-                      : '1.2 hrs'
-                    }
-                  </p>
-                </div>
-              </div>
+              {sleepData.length === 0 ? (
+                renderEmptyTab("Sleep", "Log your hours of sleep to track recovery and sleep architecture over time.", Moon)
+              ) : (
+                <>
+                  <div className="h-80">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={sleepData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                        <defs>
+                          <linearGradient id="colorDeep" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4}/>
+                            <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                          </linearGradient>
+                          <linearGradient id="colorLight" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#93c5fd" stopOpacity={0.4}/>
+                            <stop offset="95%" stopColor="#93c5fd" stopOpacity={0}/>
+                          </linearGradient>
+                          <linearGradient id="colorRem" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#818cf8" stopOpacity={0.4}/>
+                            <stop offset="95%" stopColor="#818cf8" stopOpacity={0}/>
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" opacity={0.3} />
+                        <XAxis 
+                          dataKey="date" 
+                          stroke="hsl(var(--muted-foreground))" 
+                          fontSize={12}
+                          tickLine={false}
+                          axisLine={false}
+                        />
+                        <YAxis 
+                          stroke="hsl(var(--muted-foreground))" 
+                          fontSize={12}
+                          tickLine={false}
+                          axisLine={false}
+                          label={{ 
+                            value: 'hours', 
+                            angle: -90, 
+                            position: 'insideLeft', 
+                            style: { textAnchor: 'middle', fill: 'hsl(var(--muted-foreground))' } 
+                          }}
+                        />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: 'hsl(var(--card))',
+                            borderColor: 'hsl(var(--border))',
+                            borderRadius: 'var(--radius)',
+                            color: 'hsl(var(--card-foreground))'
+                          }}
+                        />
+                        <Area 
+                          type="monotone" 
+                          name="Total Sleep"
+                          dataKey="hours" 
+                          stroke="hsl(var(--primary))" 
+                          fill="none"
+                          strokeWidth={2}
+                          activeDot={{ r: 6 }}
+                          dot={{ r: 3, strokeWidth: 2 }}
+                        />
+                        <Area 
+                          type="monotone" 
+                          name="Deep Sleep" 
+                          dataKey="deep" 
+                          stackId="1" 
+                          stroke="#3b82f6" 
+                          fill="url(#colorDeep)" 
+                        />
+                        <Area 
+                          type="monotone" 
+                          name="Light Sleep" 
+                          dataKey="light" 
+                          stackId="1" 
+                          stroke="#93c5fd" 
+                          fill="url(#colorLight)" 
+                        />
+                        <Area 
+                          type="monotone" 
+                          name="REM Sleep" 
+                          dataKey="rem" 
+                          stackId="1" 
+                          stroke="#818cf8" 
+                          fill="url(#colorRem)" 
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="mt-4 grid grid-cols-4 gap-4 text-center">
+                    <div className="p-3 bg-muted/30 rounded-lg">
+                      <p className="text-sm text-muted-foreground">Total Sleep</p>
+                      <p className="text-lg font-bold">
+                        {getLatestMetric('sleep_hours') 
+                          ? `${getLatestMetric('sleep_hours')?.value} hrs`
+                          : '-- hrs'
+                        }
+                      </p>
+                    </div>
+                    <div className="p-3 bg-muted/30 rounded-lg">
+                      <p className="text-sm text-muted-foreground">Deep</p>
+                      <p className="text-lg font-bold text-blue-500">
+                        {getLatestMetric('sleep_deep') 
+                          ? `${getLatestMetric('sleep_deep')?.value} hrs`
+                          : '-- hrs'
+                        }
+                      </p>
+                    </div>
+                    <div className="p-3 bg-muted/30 rounded-lg">
+                      <p className="text-sm text-muted-foreground">Light</p>
+                      <p className="text-lg font-bold text-blue-300">
+                        {getLatestMetric('sleep_light') 
+                          ? `${getLatestMetric('sleep_light')?.value} hrs`
+                          : '-- hrs'
+                        }
+                      </p>
+                    </div>
+                    <div className="p-3 bg-muted/30 rounded-lg">
+                      <p className="text-sm text-muted-foreground">REM</p>
+                      <p className="text-lg font-bold text-indigo-400">
+                        {getLatestMetric('sleep_rem') 
+                          ? `${getLatestMetric('sleep_rem')?.value} hrs`
+                          : '-- hrs'
+                        }
+                      </p>
+                    </div>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
         
+        {/* BLOOD PRESSURE TAB */}
         <TabsContent value="blood-pressure" className="mt-0">
           <Card>
             <CardHeader>
@@ -552,90 +526,91 @@ const Metrics = () => {
                   <CardTitle>Blood Pressure</CardTitle>
                   <CardDescription>Systolic and diastolic measurements</CardDescription>
                 </div>
-                <div className="flex gap-2 text-sm">
-                  <Button variant="outline" size="sm">1W</Button>
-                  <Button variant="outline" size="sm" className="bg-primary/5">2W</Button>
-                  <Button variant="outline" size="sm">1M</Button>
-                </div>
               </div>
             </CardHeader>
             <CardContent>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={bloodPressureData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" opacity={0.3} />
-                    <XAxis 
-                      dataKey="date" 
-                      stroke="hsl(var(--muted-foreground))" 
-                      fontSize={12}
-                      tickLine={false}
-                      axisLine={false}
-                    />
-                    <YAxis 
-                      stroke="hsl(var(--muted-foreground))" 
-                      fontSize={12}
-                      tickLine={false}
-                      axisLine={false}
-                      label={{ 
-                        value: 'mmHg', 
-                        angle: -90, 
-                        position: 'insideLeft', 
-                        style: { textAnchor: 'middle', fill: 'hsl(var(--muted-foreground))' } 
-                      }}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: 'hsl(var(--card))',
-                        borderColor: 'hsl(var(--border))',
-                        borderRadius: 'var(--radius)',
-                        color: 'hsl(var(--card-foreground))'
-                      }}
-                    />
-                    <Line 
-                      type="monotone" 
-                      name="Systolic"
-                      dataKey="systolic" 
-                      stroke="hsl(var(--accent))" 
-                      strokeWidth={2}
-                      activeDot={{ r: 6 }}
-                      dot={{ r: 3, fill: 'hsl(var(--background))', strokeWidth: 2 }}
-                    />
-                    <Line 
-                      type="monotone" 
-                      name="Diastolic"
-                      dataKey="diastolic" 
-                      stroke="hsl(var(--primary))" 
-                      strokeWidth={2}
-                      activeDot={{ r: 6 }}
-                      dot={{ r: 3, fill: 'hsl(var(--background))', strokeWidth: 2 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="mt-4 grid grid-cols-3 gap-4 text-center">
-                <div className="p-3 bg-muted/30 rounded-lg">
-                  <p className="text-sm text-muted-foreground">Avg. Systolic</p>
-                  <p className="text-lg font-bold text-accent">
-                    {getLatestMetric('blood_pressure_systolic') 
-                      ? `${getLatestMetric('blood_pressure_systolic')?.value} mmHg`
-                      : '120.6 mmHg'
-                    }
-                  </p>
-                </div>
-                <div className="p-3 bg-muted/30 rounded-lg">
-                  <p className="text-sm text-muted-foreground">Avg. Diastolic</p>
-                  <p className="text-lg font-bold text-primary">
-                    {getLatestMetric('blood_pressure_diastolic') 
-                      ? `${getLatestMetric('blood_pressure_diastolic')?.value} mmHg`
-                      : '76.4 mmHg'
-                    }
-                  </p>
-                </div>
-                <div className="p-3 bg-muted/30 rounded-lg">
-                  <p className="text-sm text-muted-foreground">Status</p>
-                  <p className="text-lg font-bold text-green-500">Healthy</p>
-                </div>
-              </div>
+              {bloodPressureData.length === 0 ? (
+                renderEmptyTab("Blood Pressure", "Track your systolic and diastolic measurements to monitor cardiovascular health.", Activity)
+              ) : (
+                <>
+                  <div className="h-80">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={bloodPressureData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" opacity={0.3} />
+                        <XAxis 
+                          dataKey="date" 
+                          stroke="hsl(var(--muted-foreground))" 
+                          fontSize={12}
+                          tickLine={false}
+                          axisLine={false}
+                        />
+                        <YAxis 
+                          stroke="hsl(var(--muted-foreground))" 
+                          fontSize={12}
+                          tickLine={false}
+                          axisLine={false}
+                          label={{ 
+                            value: 'mmHg', 
+                            angle: -90, 
+                            position: 'insideLeft', 
+                            style: { textAnchor: 'middle', fill: 'hsl(var(--muted-foreground))' } 
+                          }}
+                        />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: 'hsl(var(--card))',
+                            borderColor: 'hsl(var(--border))',
+                            borderRadius: 'var(--radius)',
+                            color: 'hsl(var(--card-foreground))'
+                          }}
+                        />
+                        <Line 
+                          type="monotone" 
+                          name="Systolic"
+                          dataKey="systolic" 
+                          stroke="hsl(var(--accent))" 
+                          strokeWidth={2}
+                          activeDot={{ r: 6 }}
+                          dot={{ r: 3, fill: 'hsl(var(--background))', strokeWidth: 2 }}
+                        />
+                        <Line 
+                          type="monotone" 
+                          name="Diastolic"
+                          dataKey="diastolic" 
+                          stroke="hsl(var(--primary))" 
+                          strokeWidth={2}
+                          activeDot={{ r: 6 }}
+                          dot={{ r: 3, fill: 'hsl(var(--background))', strokeWidth: 2 }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="mt-4 grid grid-cols-3 gap-4 text-center">
+                    <div className="p-3 bg-muted/30 rounded-lg">
+                      <p className="text-sm text-muted-foreground">Latest Systolic</p>
+                      <p className="text-lg font-bold text-accent">
+                        {getLatestMetric('blood_pressure_systolic') 
+                          ? `${getLatestMetric('blood_pressure_systolic')?.value} mmHg`
+                          : '-- mmHg'
+                        }
+                      </p>
+                    </div>
+                    <div className="p-3 bg-muted/30 rounded-lg">
+                      <p className="text-sm text-muted-foreground">Latest Diastolic</p>
+                      <p className="text-lg font-bold text-primary">
+                        {getLatestMetric('blood_pressure_diastolic') 
+                          ? `${getLatestMetric('blood_pressure_diastolic')?.value} mmHg`
+                          : '-- mmHg'
+                        }
+                      </p>
+                    </div>
+                    <div className="p-3 bg-muted/30 rounded-lg">
+                      <p className="text-sm text-muted-foreground">Status</p>
+                      <p className="text-lg font-bold text-teal-400">Recorded</p>
+                    </div>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

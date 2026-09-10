@@ -30,29 +30,26 @@ export function PersonalizedGreeting() {
 
   // Get user's display name or fallback to email or default
   const getUserName = () => {
-    if (currentUser?.displayName) {
-      return currentUser.displayName.split(' ')[0]; // Get first name only
+    if (currentUser?.firstName) {
+      return currentUser.firstName;
     }
     if (currentUser?.email) {
-      return currentUser.email.split('@')[0]; // Get username from email
+      return currentUser.email.split('@')[0];
     }
-    return 'User';
+    return 'Athlete';
   };
 
   // Get user initials for avatar
   const getUserInitials = () => {
-    if (currentUser?.displayName) {
-      return currentUser.displayName
-        .split(' ')
-        .map(name => name.charAt(0))
-        .join('')
-        .toUpperCase()
-        .slice(0, 2);
+    if (currentUser?.firstName) {
+      const first = currentUser.firstName.charAt(0);
+      const last = currentUser.lastName ? currentUser.lastName.charAt(0) : '';
+      return `${first}${last}`.toUpperCase();
     }
     if (currentUser?.email) {
       return currentUser.email.charAt(0).toUpperCase();
     }
-    return 'U';
+    return 'FT';
   };
 
   useEffect(() => {

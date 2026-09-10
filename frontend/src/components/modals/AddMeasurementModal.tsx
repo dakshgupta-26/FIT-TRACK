@@ -26,6 +26,7 @@ const measurementTypes = [
   { value: 'sleep_rem', label: 'REM Sleep', unit: 'hours', icon: Clock },
   { value: 'bmi', label: 'BMI', unit: '', icon: Activity },
   { value: 'body_fat', label: 'Body Fat', unit: '%', icon: Weight },
+  { value: 'steps', label: 'Daily Steps', unit: 'steps', icon: Activity },
 ];
 
 const AddMeasurementModal: React.FC<AddMeasurementModalProps> = ({ onMeasurementAdded }) => {
@@ -40,11 +41,12 @@ const AddMeasurementModal: React.FC<AddMeasurementModalProps> = ({ onMeasurement
   });
   const { toast } = useToast();
   const { currentUser } = useAuth();
+  const userUid = currentUser?.uid || currentUser?._id;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!currentUser?.uid) {
+    if (!userUid) {
       toast({
         title: "Error",
         description: "You must be logged in to add measurements",
@@ -66,7 +68,7 @@ const AddMeasurementModal: React.FC<AddMeasurementModalProps> = ({ onMeasurement
 
     try {
       const { data: result } = await apiClient.post('/health-metrics', {
-        uid: currentUser.uid,
+        uid: userUid,
         type: formData.type,
         value: parseFloat(formData.value),
         unit: formData.unit,

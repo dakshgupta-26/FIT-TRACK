@@ -37,8 +37,8 @@ export const createPost = async (req, res) => {
 
     const newPost = await Post.create({
       author: userId || "650000000000000000000001",
-      authorName: req.user?.name || "Daksh Gupta",
-      authorAvatar: req.user?.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=300&auto=format&fit=crop",
+      authorName: (req.user?.firstName ? `${req.user.firstName} ${req.user.lastName || ""}`.trim() : req.user?.name) || req.user?.email || "Athlete",
+      authorAvatar: req.user?.profileImageUrl || req.user?.avatar || "",
       type,
       caption,
       mediaUrls: mediaUrls || [],

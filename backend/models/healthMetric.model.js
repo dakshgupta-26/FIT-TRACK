@@ -17,6 +17,7 @@ const healthMetricSchema = new mongoose.Schema(
         "sleep_rem",
         "bmi",
         "body_fat",
+        "steps",
       ],
       required: true,
     },

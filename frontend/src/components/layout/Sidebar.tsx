@@ -3,6 +3,7 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { AiCommandSearchModal } from './AiCommandSearchModal';
+import { useAuth } from '@/contexts/AuthContext';
 import {
   Home,
   Dumbbell,
@@ -84,6 +85,15 @@ export function Sidebar({ mobileOpen = false, onCloseMobile }: SidebarProps) {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { currentUser, logout } = useAuth();
+
+  const userDisplayName = currentUser?.firstName
+    ? `${currentUser.firstName} ${currentUser.lastName || ''}`.trim()
+    : currentUser?.email?.split('@')[0] || 'Athlete';
+
+  const userInitials = currentUser?.firstName
+    ? `${currentUser.firstName[0]}${currentUser.lastName ? currentUser.lastName[0] : ''}`.toUpperCase()
+    : (currentUser?.email?.[0] || 'U').toUpperCase();
 
   // Telemetry widgets ticker
   const telemetryData = [
@@ -111,8 +121,7 @@ export function Sidebar({ mobileOpen = false, onCloseMobile }: SidebarProps) {
   const TelemetryIcon = currentTelemetry.icon;
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    logout();
     navigate('/login');
   };
 
@@ -318,22 +327,28 @@ export function Sidebar({ mobileOpen = false, onCloseMobile }: SidebarProps) {
               )}
             >
               <div className="relative shrink-0">
-                <img
-                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=300&auto=format&fit=crop"
-                  alt="user"
-                  className="w-9 h-9 rounded-full object-cover border border-teal-400/50"
-                />
+                {currentUser?.profileImageUrl ? (
+                  <img
+                    src={currentUser.profileImageUrl}
+                    alt={userDisplayName}
+                    className="w-9 h-9 rounded-full object-cover border border-teal-400/50"
+                  />
+                ) : (
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-teal-500 to-emerald-500 flex items-center justify-center font-bold text-xs text-slate-950 border border-teal-400/50 shadow-md">
+                    {userInitials}
+                  </div>
+                )}
                 <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-slate-950" />
               </div>
 
               {isExpanded && (
                 <div className="min-w-0 flex-1">
                   <div className="text-xs font-black text-white truncate group-hover:text-teal-300">
-                    Daksh Gupta
+                    {userDisplayName}
                   </div>
                   <div className="text-[10px] font-mono text-teal-400 font-bold flex items-center gap-1">
-                    <span>PRO MEMBER</span>
-                    <span>• Lvl 42</span>
+                    <span>MEMBER</span>
+                    <span>• {currentUser?.email ? 'ACTIVE' : 'GUEST'}</span>
                   </div>
                 </div>
               )}
