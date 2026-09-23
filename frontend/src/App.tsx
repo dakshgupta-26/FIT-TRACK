@@ -206,6 +206,13 @@ const AppContent = () => {
             </Layout>
           </ProtectedRoute>
         } />
+        <Route path="/settings/:section" element={
+          <ProtectedRoute>
+            <Layout theme={theme} setTheme={handleThemeChange}>
+              <Settings />
+            </Layout>
+          </ProtectedRoute>
+        } />
         <Route path="/music" element={
           <ProtectedRoute>
             <Layout theme={theme} setTheme={handleThemeChange}>
