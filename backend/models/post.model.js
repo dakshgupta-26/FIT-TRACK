@@ -1,5 +1,17 @@
 import mongoose from "mongoose";
 
+const commentReplySchema = new mongoose.Schema(
+  {
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    userName: { type: String, required: true },
+    userAvatar: { type: String, default: "" },
+    text: { type: String, required: true },
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    createdAt: { type: Date, default: Date.now },
+  },
+  { timestamps: true }
+);
+
 const commentSchema = new mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
@@ -7,6 +19,7 @@ const commentSchema = new mongoose.Schema(
     userAvatar: { type: String, default: "" },
     text: { type: String, required: true },
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    replies: [commentReplySchema],
     createdAt: { type: Date, default: Date.now },
   },
   { timestamps: true }
@@ -20,12 +33,14 @@ const postSchema = new mongoose.Schema(
     authorBadge: { type: String, default: "PRO ATHLETE" },
     type: {
       type: String,
-      enum: ["photo", "video", "workout", "meal", "progress", "reel", "challenge", "voice", "route"],
+      enum: ["photo", "video", "workout", "transformation", "meal", "progress", "reel", "challenge", "voice", "route"],
       default: "workout",
     },
     caption: { type: String, required: true },
     mediaUrls: [{ type: String }],
     audioUrl: { type: String, default: "" },
+    tags: [{ type: String }],
+    hashtags: [{ type: String }],
 
     // Fitness Overlay Telemetry
     workoutMetrics: {
@@ -55,6 +70,11 @@ const postSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+postSchema.index({ createdAt: -1 });
+postSchema.index({ author: 1, createdAt: -1 });
+postSchema.index({ type: 1, createdAt: -1 });
+postSchema.index({ hashtags: 1 });
 
 const Post = mongoose.models.Post || mongoose.model("Post", postSchema);
 export default Post;

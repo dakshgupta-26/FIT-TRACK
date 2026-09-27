@@ -12,6 +12,8 @@ import apiRoutes from "./routes/index.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { checkDbConnection } from "./middleware/checkDbConnection.js";
 import { verifyMailjetConfig } from "./services/email/email.service.js";
+import http from "http";
+import { initSocket } from "./socket/index.js";
 
 // --- INITIAL ENVIRONMENT SETUP ---
 dotenv.config();
@@ -20,6 +22,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+const server = http.createServer(app);
 const PORT = process.env.PORT || 5000;
 
 // Validate essential environment variables
@@ -121,11 +124,20 @@ const startServer = async () => {
     console.warn("Email service verification notice:", err.message)
   );
 
-  // 4. Start Accepting HTTP Requests
-  app.listen(PORT, () => {
+  // 4. Initialize Real-Time Socket.IO Engine
+  try {
+    initSocket(server);
+    console.log("⚡ Fit Track Real-Time Socket.IO Engine initialized successfully");
+  } catch (socketErr) {
+    console.warn("⚠️ Socket.IO initialization warning:", socketErr.message);
+  }
+
+  // 5. Start Accepting HTTP & WebSocket Connections
+  server.listen(PORT, () => {
     console.log(`\n=======================================================`);
     console.log(`🟢 Fit Track Server listening on: http://localhost:${PORT}`);
     console.log(`📊 Health Endpoint: http://localhost:${PORT}/api/health`);
+    console.log(`⚡ WebSocket Engine: ws://localhost:${PORT} (Active)`);
     console.log(`🔒 Database Status: ${isConnected ? "Connected (100% Ready)" : "DISCONNECTED (Requires MongoDB Start)"}`);
     console.log(`=======================================================\n`);
   });

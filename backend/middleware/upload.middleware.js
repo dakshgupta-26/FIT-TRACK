@@ -36,3 +36,29 @@ export const uploadProgressImage = multer({
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
   fileFilter: fileFilter,
 });
+
+// Middleware for Post uploads (images or video up to 50MB)
+export const uploadPostMedia = multer({
+  storage: memoryStorage,
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith("image/") || file.mimetype.startsWith("video/")) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only image and video files are supported"), false);
+    }
+  },
+});
+
+// Middleware for Fitness Reels (videos up to 100MB)
+export const uploadReelVideo = multer({
+  storage: memoryStorage,
+  limits: { fileSize: 100 * 1024 * 1024 }, // 100MB
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith("video/")) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only video files are supported for Reels"), false);
+    }
+  },
+});

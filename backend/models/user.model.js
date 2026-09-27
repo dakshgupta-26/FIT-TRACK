@@ -54,9 +54,37 @@ const userSchema = new mongoose.Schema(
         lastSeenAt: { type: Date, default: Date.now },
       },
     ],
+    bio: { type: String, default: "" },
+    username: { type: String, trim: true },
+    badge: { type: String, default: "PRO ATHLETE" },
+    location: { type: String, default: "" },
+    followersCount: { type: Number, default: 0 },
+    followingCount: { type: Number, default: 0 },
+    postsCount: { type: Number, default: 0 },
+    reelsCount: { type: Number, default: 0 },
+    workoutStats: {
+      totalWorkouts: { type: Number, default: 24 },
+      totalMinutes: { type: Number, default: 1140 },
+      totalCalories: { type: Number, default: 18450 },
+      streakDays: { type: Number, default: 7 },
+    },
+    fitnessGoals: [
+      {
+        title: { type: String, default: "Daily Step Goal" },
+        target: { type: String, default: "10,000 steps" },
+        progress: { type: Number, default: 75 },
+      },
+    ],
+    savedPosts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
+    blockedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    isOnline: { type: Boolean, default: false },
+    lastSeen: { type: Date, default: Date.now },
   },
   { timestamps: true }
 );
+
+userSchema.index({ username: 1 });
+userSchema.index({ isOnline: 1, lastSeen: -1 });
 
 userSchema.pre("save", async function (next) {
   if (this.isNew && !this.uid) {

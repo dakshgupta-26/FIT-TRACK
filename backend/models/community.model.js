@@ -14,6 +14,10 @@ const followSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+followSchema.index({ follower: 1, following: 1 }, { unique: true });
+followSchema.index({ follower: 1 });
+followSchema.index({ following: 1 });
+
 // --- FITNESS GROUP / CLUB MODEL ---
 const groupSchema = new mongoose.Schema(
   {
