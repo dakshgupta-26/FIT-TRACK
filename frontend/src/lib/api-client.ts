@@ -24,6 +24,27 @@ export const getApiBaseUrl = (): string => {
 };
 
 /**
+ * Resolves a media or progress image URL.
+ * If the URL is already absolute (Cloudinary, blob, data), returns as is.
+ * If relative (/uploads/...), prepends the backend origin.
+ */
+export const resolveImageUrl = (url?: string | null): string => {
+  if (!url) return '';
+  if (
+    url.startsWith('http://') ||
+    url.startsWith('https://') ||
+    url.startsWith('data:') ||
+    url.startsWith('blob:')
+  ) {
+    return url;
+  }
+  const base = getApiBaseUrl().replace(/\/api$/, '');
+  const cleanPath = url.startsWith('/') ? url : `/${url}`;
+  return `${base}${cleanPath}`;
+};
+
+
+/**
  * Production-ready Axios Client for FitTrack
  */
 export const apiClient: AxiosInstance = axios.create({

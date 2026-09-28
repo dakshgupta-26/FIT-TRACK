@@ -53,7 +53,7 @@ const navGroups: NavGroup[] = [
     groupName: 'WORKOUT & AI OS',
     items: [
       { label: 'Workouts', href: '/workouts', icon: Dumbbell, isHot: true },
-      { label: 'AI Coach & Analytics', href: '/progress', icon: Sparkles, badge: 'PRO' },
+      { label: 'Progress & Analytics', href: '/progress', icon: Sparkles, badge: 'PRO' },
       { label: 'Audio & Beats', href: '/music', icon: Music, badge: '165 BPM' },
     ],
   },

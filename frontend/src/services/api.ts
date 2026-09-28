@@ -1,4 +1,4 @@
-import apiClient, { getApiBaseUrl } from "@/lib/api-client";
+import apiClient, { getApiBaseUrl, resolveImageUrl } from "@/lib/api-client";
 
-export { getApiBaseUrl };
+export { getApiBaseUrl, resolveImageUrl };
 export default apiClient;
